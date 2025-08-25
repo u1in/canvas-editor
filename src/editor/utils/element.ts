@@ -43,6 +43,7 @@ import { ElementType } from '../dataset/enum/Element'
 import { ListStyle, ListType, UlStyle } from '../dataset/enum/List'
 import { RowFlex } from '../dataset/enum/Row'
 import { TableBorder, TdBorder } from '../dataset/enum/table/Table'
+import { VerticalAlign } from '../dataset/enum/VerticalAlign'
 import { DeepRequired } from '../interface/Common'
 import { IControlSelect } from '../interface/Control'
 import { IEditorOption } from '../interface/Editor'
@@ -1553,6 +1554,8 @@ export function getElementListByHTML(
             colgroup: [],
             trList: []
           }
+          // colgroup
+          const colElements = tableElement.querySelectorAll('colgroup col')
           // 基础数据
           tableElement.querySelectorAll('tr').forEach(trElement => {
             const trHeightStr = window
@@ -1571,7 +1574,10 @@ export function getElementListByHTML(
               const td: ITd = {
                 colspan: tableCell.colSpan,
                 rowspan: tableCell.rowSpan,
-                value: valueList
+                value: valueList,
+                verticalAlign: window.getComputedStyle(tdElement)
+                  .verticalAlign as VerticalAlign,
+                width: parseFloat(window.getComputedStyle(tdElement).width)
               }
               if (tableCell.style.backgroundColor) {
                 td.backgroundColor = tableCell.style.backgroundColor
@@ -1588,8 +1594,9 @@ export function getElementListByHTML(
             )
             const width = Math.ceil(options.innerWidth / tdCount)
             for (let i = 0; i < tdCount; i++) {
+              const colElement = colElements[i]?.getAttribute('width')
               element.colgroup!.push({
-                width
+                width: colElement ? parseFloat(colElement) : width
               })
             }
             elementList.push(element)
@@ -1775,14 +1782,22 @@ export function getNonHideElementIndex(
   index: number,
   position: LocationPosition = LocationPosition.BEFORE
 ) {
-  if (!elementList[index]?.control?.hide && !elementList[index]?.area?.hide) {
+  if (
+    !elementList[index]?.hide &&
+    !elementList[index]?.control?.hide &&
+    !elementList[index]?.area?.hide
+  ) {
     return index
   }
   let i = index
   if (position === LocationPosition.BEFORE) {
     i = index - 1
     while (i > 0) {
-      if (!elementList[i]?.control?.hide && !elementList[i]?.area?.hide) {
+      if (
+        !elementList[i]?.hide &&
+        !elementList[i]?.control?.hide &&
+        !elementList[i]?.area?.hide
+      ) {
         return i
       }
       i--
@@ -1790,7 +1805,11 @@ export function getNonHideElementIndex(
   } else {
     i = index + 1
     while (i < elementList.length) {
-      if (!elementList[i]?.control?.hide && !elementList[i]?.area?.hide) {
+      if (
+        !elementList[i]?.hide &&
+        !elementList[i]?.control?.hide &&
+        !elementList[i]?.area?.hide
+      ) {
         return i
       }
       i++
