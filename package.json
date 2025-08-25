@@ -1,6 +1,6 @@
 {
-  "name": "@hufe921/canvas-editor",
-  "author": "Hufe",
+  "name": "@u1in/canvas-editor",
+  "author": "u1in",
   "license": "MIT",
   "version": "0.9.114",
   "description": "rich text editor by canvas/svg",
@@ -18,10 +18,10 @@
   "typings": "./dist/src/editor/index.d.ts",
   "main": "./dist/canvas-editor.umd.js",
   "module": "./dist/canvas-editor.es.js",
-  "homepage": "https://github.com/Hufe921/canvas-editor",
+  "homepage": "https://github.com/u1in/canvas-editor",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Hufe921/canvas-editor.git"
+    "url": "https://github.com/u1in/canvas-editor.git"
   },
   "keywords": [
     "canvas-editor",
