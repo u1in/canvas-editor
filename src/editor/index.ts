@@ -81,6 +81,8 @@ export default class Editor {
   public register: Register
   public destroy: () => void
   public use: UsePlugin
+  // MODIFY 暴露 draw
+  public draw: Draw
 
   constructor(
     container: HTMLDivElement,
@@ -131,6 +133,8 @@ export default class Editor {
       this.eventBus,
       this.override
     )
+    // MODIFY 暴露 draw
+    this.draw = draw
     // 命令
     this.command = new Command(new CommandAdapt(draw))
     // 菜单
