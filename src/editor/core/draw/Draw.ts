@@ -2842,7 +2842,7 @@ export class Draw {
     // 日期控件
     this.getDateParticle().clearDatePicker()
   }
-  // Modify 暴露drawRowList
+  // MODIFY 暴露drawRowList
   public getDrawRowList() {
     return this.rowList
   }
