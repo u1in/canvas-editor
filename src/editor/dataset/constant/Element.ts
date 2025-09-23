@@ -74,6 +74,8 @@ export const EDITOR_ELEMENT_ZIP_ATTR: Array<keyof IElement> = [
   'conceptId',
   'imgDisplay',
   'imgFloatPosition',
+  // MODIFY 添加新api 偏移量
+  'posOffset',
   'imgToolDisabled',
   'textDecoration',
   'extension',
