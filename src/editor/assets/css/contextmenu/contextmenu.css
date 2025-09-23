@@ -75,6 +75,10 @@
   height: 1px;
 }
 
+.ce-contextmenu-position {
+  background-image: url(../../../assets/images/position.svg);
+}
+
 .ce-contextmenu-print {
   background-image: url(../../../assets/images/print.svg);
 }
