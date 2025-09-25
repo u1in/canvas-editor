@@ -40,4 +40,5 @@ export interface EventBusMap {
   imageSizeChange: IImageSizeChange
   imageMousedown: IImageMousedown
   previewClear: () => void
+  imagePreviewSizeChange: (payload: { width: number; height: number }) => void
 }

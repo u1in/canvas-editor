@@ -130,6 +130,8 @@ export class Previewer {
     this.container.append(resizerSelection)
     // 尺寸查看
     const resizerSizeView = document.createElement('div')
+    // MODIFY 隐藏尺寸显示
+    resizerSizeView.style.display = "none";
     resizerSizeView.classList.add(`${EDITOR_PREFIX}-resizer-size-view`)
     const resizerSize = document.createElement('span')
     resizerSizeView.append(resizerSize)
@@ -499,6 +501,10 @@ export class Previewer {
   }
 
   public _updateResizerSizeView(width: number, height: number) {
+    this.eventBus.emit('imagePreviewSizeChange', {
+      width: Math.round(width),
+      height: Math.round(height)
+    })
     this.resizerSize.innerText = `${Math.round(width)} × ${Math.round(height)}`
   }
 
@@ -577,7 +583,7 @@ export class Previewer {
 
   public clearResizer() {
     this.resizerSelection.style.display = 'none'
-    this.eventBus.emit("previewClear")
+    this.eventBus.emit('previewClear')
     document.removeEventListener('keydown', this._keydown)
   }
 }
