@@ -577,6 +577,7 @@ export class Previewer {
 
   public clearResizer() {
     this.resizerSelection.style.display = 'none'
+    this.eventBus.emit("previewClear")
     document.removeEventListener('keydown', this._keydown)
   }
 }
