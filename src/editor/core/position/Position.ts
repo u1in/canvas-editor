@@ -148,15 +148,21 @@ export class Position {
       const tablePreY = y
       for (let j = 0; j < curRow.elementList.length; j++) {
         const element = curRow.elementList[j]
-
         const metrics = element.metrics
-        const offsetY =
+        let offsetY =
           !element.hide &&
           ((element.imgDisplay !== ImageDisplay.INLINE &&
             element.type === ElementType.IMAGE) ||
             element.type === ElementType.LATEX)
             ? curRow.ascent - metrics.height
             : curRow.ascent
+        // MODIFY 新增一项配置，允许垂直布局
+        offsetY =
+          !element.hide &&
+          element.type === ElementType.IMAGE &&
+          element.allowVerticalLayout
+            ? (curRow.height - element.height!) / 2
+            : offsetY
         // 偏移量
         if (element.left) {
           x += element.left

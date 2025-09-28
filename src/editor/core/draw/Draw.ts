@@ -1913,9 +1913,28 @@ export class Draw {
           curRow.height = defaultBasicRowMarginHeight
           curRow.ascent = defaultBasicRowMarginHeight
         } else if (curRow.height < height) {
-          // Max行高在这里实现
-          curRow.height = height
-          curRow.ascent = ascent
+          // MODIFY 新增一项配置，允许垂直布局
+          if (
+            !element.hide &&
+            element.type === ElementType.IMAGE &&
+            element.allowVerticalLayout
+          ) {
+            // 基线文字测量信息
+            const standardMetrics = this.textParticle.measureBasisWord(
+              ctx,
+              this.getElementFont(element)
+            )
+            curRow.height = height
+            curRow.ascent =
+              ascent -
+              metrics.height / 2 +
+              standardMetrics.fontBoundingBoxAscent / 2
+          } else {
+            // TODO 这里计算行高度，图片高度将会影响行高度
+            curRow.height = height
+            // TODO 这里计算行基线，图片高度将会影响基线
+            curRow.ascent = ascent
+          }
         }
         curRow.elementList.push(rowElement)
       }
