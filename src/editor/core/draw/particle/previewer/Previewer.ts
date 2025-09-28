@@ -131,7 +131,7 @@ export class Previewer {
     // 尺寸查看
     const resizerSizeView = document.createElement('div')
     // MODIFY 隐藏尺寸显示
-    resizerSizeView.style.display = "none";
+    resizerSizeView.style.display = 'none'
     resizerSizeView.classList.add(`${EDITOR_PREFIX}-resizer-size-view`)
     const resizerSize = document.createElement('span')
     resizerSizeView.append(resizerSize)
@@ -163,6 +163,10 @@ export class Previewer {
   private _mousedown(evt: MouseEvent) {
     this.canvas = this.draw.getPage()
     if (!this.curElement) return
+    this.eventBus.emit('previewerOnDrag', {
+      element: this.curElement,
+      position: this.curPosition!
+    })
     const { scale } = this.options
     this.mousedownX = evt.x
     this.mousedownY = evt.y
@@ -197,6 +201,10 @@ export class Previewer {
           this.draw.render({
             isSetCursor: true,
             curIndex: this.curPosition?.index
+          })
+          this.eventBus.emit('previewerOnDrop', {
+            element: this.curElement,
+            position: this.curPosition!
           })
         }
         // 还原副作用

@@ -5,7 +5,7 @@ import { RowFlex } from '../dataset/enum/Row'
 import { TitleLevel } from '../dataset/enum/Title'
 import { IControlChangeResult, IControlContentChangeResult } from './Control'
 import { IEditorResult } from './Editor'
-import { IElement } from './Element'
+import { IElement, IElementPosition } from './Element'
 import { IPositionContext } from './Position'
 import { ITextDecoration } from './Text'
 
@@ -75,4 +75,21 @@ export type IImageSizeChange = (payload: { element: IElement }) => void
 export type IImageMousedown = (payload: {
   evt: MouseEvent
   element: IElement
+}) => void
+
+export type IPreviewClear = () => void
+
+export type IPreviewerOnDrag = (payload: {
+  element: IElement
+  position: IElementPosition
+}) => void
+
+export type IPreviewerOnDrop = (payload: {
+  element: IElement
+  position: IElementPosition
+}) => void
+
+export type IImagePreviewSizeChange = (payload: {
+  width: number
+  height: number
 }) => void

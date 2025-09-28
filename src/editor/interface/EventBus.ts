@@ -3,6 +3,7 @@ import {
   IControlChange,
   IControlContentChange,
   IImageMousedown,
+  IImagePreviewSizeChange,
   IImageSizeChange,
   IInputEventChange,
   IIntersectionPageNoChange,
@@ -11,6 +12,9 @@ import {
   IPageScaleChange,
   IPageSizeChange,
   IPositionContextChange,
+  IPreviewClear,
+  IPreviewerOnDrag,
+  IPreviewerOnDrop,
   IRangeStyleChange,
   ISaved,
   IVisiblePageNoListChange,
@@ -39,6 +43,8 @@ export interface EventBusMap {
   positionContextChange: IPositionContextChange
   imageSizeChange: IImageSizeChange
   imageMousedown: IImageMousedown
-  previewClear: () => void
-  imagePreviewSizeChange: (payload: { width: number; height: number }) => void
+  previewClear: IPreviewClear
+  previewerOnDrag: IPreviewerOnDrag
+  previewerOnDrop: IPreviewerOnDrop
+  imagePreviewSizeChange: IImagePreviewSizeChange
 }
