@@ -150,6 +150,14 @@ export interface IAreaElement {
   area?: IArea
 }
 
+// MODIFY 添加新api 位置偏移量
+export interface IPosOffset {
+  posOffset?: {
+    x: number
+    y: number
+  }
+}
+
 // MODIFY 添加新api meta存放元信息
 export interface IElementMeta {
   meta?: any
@@ -179,7 +187,10 @@ export type IElement = IElementBasic &
   IListElement &
   IAreaElement &
   IAllowVerticalLayout &
-  IElementMeta
+  IElementMeta &
+  IPosOffset
+
+
 
 export interface IElementMetrics {
   width: number
@@ -205,11 +216,6 @@ export interface IElementPosition {
     leftBottom: number[]
     rightTop: number[]
     rightBottom: number[]
-  }
-  // MODIFY 添加offset
-  offset?: {
-    x: number
-    y: number
   }
 }
 

@@ -163,9 +163,15 @@ export class Position {
           element.allowVerticalLayout
             ? (curRow.height - element.height!) / 2
             : offsetY
+        // MODIFY 添加新api 位置偏移量
+        offsetY += element.posOffset?.y || 0
         // 偏移量
         if (element.left) {
           x += element.left
+        }
+        // MODIFY 添加新api，位置偏移量
+        if(element.posOffset?.x) {
+          x += element.posOffset.x
         }
         const positionItem: IElementPosition = {
           pageNo,

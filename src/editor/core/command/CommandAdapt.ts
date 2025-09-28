@@ -65,6 +65,7 @@ import {
   IElementStyle,
   IGetElementByIdOption,
   IInsertElementListOption,
+  IPosOffset,
   IUpdateElementByIdOption
 } from '../../interface/Element'
 import {
@@ -1398,6 +1399,19 @@ export class CommandAdapt {
     } else {
       delete element.imgFloatPosition
     }
+    this.draw.getPreviewer().clearResizer()
+    this.draw.render({
+      isSetCursor: true,
+      curIndex: endIndex
+    })
+  }
+
+  public changeImagePositionOffset(
+    element: IElement,
+    offset: IPosOffset['posOffset']
+  ) {
+    const { endIndex } = this.range.getRange()
+    element.posOffset = offset
     this.draw.getPreviewer().clearResizer()
     this.draw.render({
       isSetCursor: true,
