@@ -1369,21 +1369,6 @@ export class Draw {
     let controlRealWidth = 0
     for (let i = 0; i < elementList.length; i++) {
       const curRow: IRow = rowList[rowList.length - 1]
-      const preRow: IRow = rowList[rowList.length - 2]
-      // MODIFY 实现居中布局
-      if (Array.isArray(preRow?.elementList)) {
-        const preRowMaxOffsetY = preRow.elementList.reduce(
-          (pre, cur) =>
-            pre < (cur.posOffset?.y || 0) ? cur.posOffset?.y || 0 : pre,
-          0
-        )
-        if (preRowMaxOffsetY > 0) {
-          curRow.offsetY =
-            (curRow.offsetY || 0) > preRowMaxOffsetY
-              ? curRow.offsetY
-              : preRowMaxOffsetY
-        }
-      }
       const element = elementList[i]
       const rowMargin =
         defaultBasicRowMarginHeight * (element.rowMargin ?? defaultRowMargin)
@@ -1436,13 +1421,11 @@ export class Draw {
             element.height = adaptiveHeight / scale
             metrics.width = availableWidth
             metrics.height = adaptiveHeight
-            metrics.boundingBoxDescent =
-              adaptiveHeight - (element.posOffset?.y || 0)
+            metrics.boundingBoxDescent = adaptiveHeight
           } else {
             metrics.width = elementWidth
             metrics.height = elementHeight
-            metrics.boundingBoxDescent =
-              elementHeight - (element.posOffset?.y || 0)
+            metrics.boundingBoxDescent = elementHeight
           }
         }
         metrics.boundingBoxAscent = 0
@@ -1772,8 +1755,7 @@ export class Draw {
         rowMargin +
         metrics.boundingBoxAscent +
         metrics.boundingBoxDescent +
-        rowMargin -
-        (element.posOffset?.y || 0)
+        rowMargin
       const rowElement: IRowElement = Object.assign(element, {
         metrics,
         left: 0,

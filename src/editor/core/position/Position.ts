@@ -149,10 +149,6 @@ export class Position {
       for (let j = 0; j < curRow.elementList.length; j++) {
         const element = curRow.elementList[j]
 
-        // MODIFY 添加元素偏移量计算
-        x += element.posOffset?.x || 0
-        y += element.posOffset?.y || 0
-
         const metrics = element.metrics
         const offsetY =
           !element.hide &&
@@ -279,10 +275,6 @@ export class Position {
           x = tablePreX
           y = tablePreY
         }
-
-        // MODIFY 末尾减去，后续恢复原始计算
-        x -= element.posOffset?.x || 0
-        y -= element.posOffset?.y || 0
       }
       x = startX
       y += curRow.height

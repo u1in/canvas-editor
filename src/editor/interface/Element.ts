@@ -150,14 +150,6 @@ export interface IAreaElement {
   area?: IArea
 }
 
-// MODIFY 添加新api 偏移量
-export interface IPosOffset {
-  posOffset?: {
-    x: number
-    y: number
-  }
-}
-
 export type IElement = IElementBasic &
   IElementStyle &
   IElementRule &
@@ -175,8 +167,7 @@ export type IElement = IElementBasic &
   IBlockElement &
   ITitleElement &
   IListElement &
-  IAreaElement &
-  IPosOffset
+  IAreaElement
 
 export interface IElementMetrics {
   width: number
