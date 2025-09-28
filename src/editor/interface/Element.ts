@@ -150,6 +150,11 @@ export interface IAreaElement {
   area?: IArea
 }
 
+// MODIFY 添加新api 垂直布局
+export interface IAllowVerticalLayout {
+  allowVerticalLayout?: boolean
+}
+
 export type IElement = IElementBasic &
   IElementStyle &
   IElementRule &
@@ -167,7 +172,8 @@ export type IElement = IElementBasic &
   IBlockElement &
   ITitleElement &
   IListElement &
-  IAreaElement
+  IAreaElement &
+  IAllowVerticalLayout
 
 export interface IElementMetrics {
   width: number
