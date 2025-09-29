@@ -169,13 +169,11 @@ export class Position {
             : offsetY
         // MODIFY 添加新api 位置偏移量
         offsetY += element.posOffset?.y || 0
+        // MODIFY 添加新api，位置偏移量
+        element.left = (element.left || 0) + (element?.posOffset?.x || 0)
         // 偏移量
         if (element.left) {
           x += element.left
-        }
-        // MODIFY 添加新api，位置偏移量
-        if(element.posOffset?.x) {
-          x += element.posOffset.x
         }
         const positionItem: IElementPosition = {
           pageNo,
