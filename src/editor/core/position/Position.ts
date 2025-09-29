@@ -160,7 +160,11 @@ export class Position {
         offsetY =
           !element.hide &&
           element.type === ElementType.IMAGE &&
-          element.allowVerticalLayout
+          element.allowVerticalLayout &&
+          // MODIFY 全部图片为垂直布局时候，才进行垂直布局
+          curRow.elementList.every(item =>
+            item.type !== ElementType.IMAGE ? true : item.allowVerticalLayout
+          )
             ? (curRow.height - element.height!) / 2
             : offsetY
         // MODIFY 添加新api 位置偏移量
