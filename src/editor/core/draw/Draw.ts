@@ -2274,10 +2274,9 @@ export class Draw {
           if (element.leftIndent?.width) {
             this.leftIndentParticle.drawLeftIndentText(
               ctx,
-              element.leftIndent?.text || '',
-              x - element.leftIndent?.width,
-              y + offsetY,
-              element.leftIndent?.fontStyle
+              element,
+              x,
+              y + offsetY
             )
           }
           // 如果当前元素设置左偏移，则上一元素立即绘制

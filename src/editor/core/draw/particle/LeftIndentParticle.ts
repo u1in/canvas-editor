@@ -14,14 +14,16 @@ export class LeftIndentParticle {
 
   public drawLeftIndentText(
     ctx: CanvasRenderingContext2D,
-    text: string,
+    element: IElement,
     x: number,
-    y: number,
-    fontStyle?: string,
+    y: number
   ): void {
     const finalFontSize = this.options.defaultSize
     const finalFontFamily = this.options.defaultFont
-    const font = fontStyle || `${finalFontSize * this.options.scale}px ${finalFontFamily}`
+    const font =
+      element?.leftIndent?.fontStyle ||
+      `${finalFontSize * this.options.scale}px ${finalFontFamily}`
+    const text = element.leftIndent?.text || ''
 
     if (!text) return
 
@@ -29,6 +31,8 @@ export class LeftIndentParticle {
     if (font) {
       ctx.font = font
     }
+    // 设置文本对齐方式为右对齐
+    ctx.textAlign = 'right'
     ctx.fillText(text, x, y)
 
     ctx.restore()
