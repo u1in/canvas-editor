@@ -138,6 +138,7 @@ export function formatElementList(
       elementList.splice(i, 1)
       elementList.splice(i, 0, {
         value: ZERO,
+        type: ElementType.LEFT_INDENT,
         leftIndent: el.leftIndent
       })
     } else if (el.type === ElementType.LIST) {
