@@ -80,6 +80,8 @@ export const EDITOR_ELEMENT_ZIP_ATTR: Array<keyof IElement> = [
   'meta',
   // MODIFY 添加新api 垂直布局
   'allowVerticalLayout',
+  // MODIFY 添加新api 左缩进
+  'leftIndent',
   'imgToolDisabled',
   'textDecoration',
   'extension',

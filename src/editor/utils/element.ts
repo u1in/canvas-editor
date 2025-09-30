@@ -85,6 +85,7 @@ export function formatElementList(
   if (
     isForceCompensation ||
     (isHandleFirstElement &&
+      startElement?.type !== ElementType.LEFT_INDENT &&
       startElement?.type !== ElementType.LIST &&
       ((startElement?.type && startElement.type !== ElementType.TEXT) ||
         !START_LINE_BREAK_REG.test(startElement?.value)))
@@ -132,6 +133,13 @@ export function formatElementList(
         }
       }
       i--
+    } else if (el.type === ElementType.LEFT_INDENT) {
+      // 移除父节点
+      elementList.splice(i, 1)
+      elementList.splice(i, 0, {
+        value: ZERO,
+        leftIndent: el.leftIndent
+      })
     } else if (el.type === ElementType.LIST) {
       // 移除父节点
       elementList.splice(i, 1)
@@ -625,6 +633,7 @@ export function zipElementList(
     if (
       e === 0 &&
       element.value === ZERO &&
+      !element.leftIndent &&
       !element.listId &&
       (!element.type || element.type === ElementType.TEXT)
     ) {
@@ -690,6 +699,15 @@ export function zipElementList(
         titleElement.valueList = zipElementList(valueList, options)
         element = titleElement
       }
+    } else if (element.leftIndent) {
+      // 左缩进处理
+      const leftIndent = element.leftIndent
+      const leftIndentElement: IElement = {
+        type: ElementType.LEFT_INDENT,
+        value: '',
+        leftIndent
+      }
+      element = leftIndentElement
     } else if (element.listId && element.listType) {
       // 列表处理
       const listId = element.listId

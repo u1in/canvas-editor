@@ -168,6 +168,15 @@ export interface IAllowVerticalLayout {
   allowVerticalLayout?: boolean
 }
 
+// MODIFY 添加新api 左缩进
+export interface ILeftIndentElement {
+  leftIndent?: {  
+    text?: string
+    width?: number
+    fontStyle?: string
+  }
+}
+
 export type IElement = IElementBasic &
   IElementStyle &
   IElementRule &
@@ -188,7 +197,8 @@ export type IElement = IElementBasic &
   IAreaElement &
   IAllowVerticalLayout &
   IElementMeta &
-  IPosOffset
+  IPosOffset &
+  ILeftIndentElement
 
 
 

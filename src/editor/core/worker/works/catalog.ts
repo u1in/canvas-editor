@@ -28,7 +28,8 @@ enum ElementType {
   BLOCK = 'block',
   TITLE = 'title',
   AREA = 'area',
-  LIST = 'list'
+  LIST = 'list',
+  LEFT_INDENT = 'leftIndent'
 }
 
 enum TitleLevel {

@@ -97,6 +97,7 @@ import {
   TEXTLIKE_ELEMENT_TYPE
 } from '../../dataset/constant/Element'
 import { ListParticle } from './particle/ListParticle'
+import { LeftIndentParticle } from './particle/LeftIndentParticle'
 import { Placeholder } from './frame/Placeholder'
 import { EventBus } from '../event/eventbus/EventBus'
 import { EventBusMap } from '../../interface/EventBus'
@@ -170,6 +171,7 @@ export class Draw {
   private blockParticle: BlockParticle
   private listParticle: ListParticle
   private lineBreakParticle: LineBreakParticle
+  private leftIndentParticle: LeftIndentParticle
   private control: Control
   private pageBorder: PageBorder
   private workerManager: WorkerManager
@@ -251,6 +253,7 @@ export class Draw {
     this.blockParticle = new BlockParticle(this)
     this.listParticle = new ListParticle(this)
     this.lineBreakParticle = new LineBreakParticle(this)
+    this.leftIndentParticle = new LeftIndentParticle(this)
     this.control = new Control(this)
     this.pageBorder = new PageBorder(this)
 
@@ -915,6 +918,10 @@ export class Draw {
 
   public getListParticle(): ListParticle {
     return this.listParticle
+  }
+
+  public getLeftIndentParticle(): LeftIndentParticle {
+    return this.leftIndentParticle
   }
 
   public getCheckboxParticle(): CheckboxParticle {
@@ -1838,6 +1845,7 @@ export class Draw {
       x += metrics.width
       // 是否强制换行
       const isForceBreak =
+        element.type === ElementType.LEFT_INDENT ||
         element.type === ElementType.SEPARATOR ||
         element.type === ElementType.TABLE ||
         preElement?.type === ElementType.TABLE ||
@@ -1895,6 +1903,14 @@ export class Draw {
           row.offsetX = listStyleMap.get(element.listId!)
           row.listIndex = listIndex
         }
+        // 继承左缩进
+        if (isWidthNotEnough && curRow.elementList[0].leftIndent?.width) {
+          row.offsetX = curRow.elementList[0].leftIndent?.width || 0
+        }
+        // 左缩进
+        if (element.leftIndent?.width) {
+          row.offsetX = element.leftIndent?.width || 0
+        }
         // Y轴偏移量
         row.offsetY =
           !isFromTable &&
@@ -1930,6 +1946,7 @@ export class Draw {
               metrics.height / 2 +
               standardMetrics.fontBoundingBoxAscent / 2
           } else {
+            // TODO 如果混排的话，这里会重设基线
             // TODO 这里计算行高度，图片高度将会影响行高度
             curRow.height = height
             // TODO 这里计算行基线，图片高度将会影响基线
@@ -2239,6 +2256,15 @@ export class Draw {
           this.textParticle.complete()
           this.blockParticle.render(pageNo, element, x, y + offsetY)
         } else {
+          if (element.leftIndent?.width && element.leftIndent?.text) {
+            this.leftIndentParticle.drawLeftIndentText(
+              ctx,
+              element.leftIndent?.text || '',
+              x - element.leftIndent?.width,
+              y + offsetY,
+              element.leftIndent?.fontStyle
+            )
+          }
           // 如果当前元素设置左偏移，则上一元素立即绘制
           if (element.left) {
             this.textParticle.complete()
