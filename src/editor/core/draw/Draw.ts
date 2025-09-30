@@ -2271,7 +2271,7 @@ export class Draw {
           this.textParticle.complete()
           this.blockParticle.render(pageNo, element, x, y + offsetY)
         } else {
-          if (element.leftIndent?.width && element.leftIndent?.text) {
+          if (element.leftIndent?.width) {
             this.leftIndentParticle.drawLeftIndentText(
               ctx,
               element.leftIndent?.text || '',
