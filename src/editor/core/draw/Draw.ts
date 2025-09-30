@@ -1903,12 +1903,27 @@ export class Draw {
           row.offsetX = listStyleMap.get(element.listId!)
           row.listIndex = listIndex
         }
-        // 继承左缩进
-        if (isWidthNotEnough && curRow.elementList[0].leftIndent?.width) {
-          row.offsetX = curRow.elementList[0].leftIndent?.width || 0
+        // 宽度不足继承左缩进
+        if (isWidthNotEnough) {
+          // 找到上一个leftIndent
+          let preLeftIndentElement: IElement | null = null
+          let i = rowList.length - 1
+          while (i >= 0) {
+            const preRow = rowList[i]
+            if (preRow.elementList[0].type === ElementType.LEFT_INDENT) {
+              preLeftIndentElement = preRow.elementList[0]
+              break
+            }
+            i--
+          }
+          row.offsetX = preLeftIndentElement?.leftIndent?.width || 0
         }
-        // 左缩进
-        if (element.leftIndent?.width) {
+        // 新起一行的左缩进
+        if (
+          !isWidthNotEnough &&
+          element.type === ElementType.LEFT_INDENT &&
+          element.leftIndent?.width
+        ) {
           row.offsetX = element.leftIndent?.width || 0
         }
         // Y轴偏移量
