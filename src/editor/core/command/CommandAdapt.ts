@@ -1768,6 +1768,106 @@ export class CommandAdapt {
     this.draw.insertElementList(cloneElementList, options)
   }
 
+  public addLeftIndentWidth(width?: number) {
+    const innerWidth = this.draw.getInnerWidth()
+    const cursorPos = this.position.getCursorPosition()
+    const rowList = this.draw.getRowList()
+    const defaultTabWidth = this.draw.getOptions().defaultTabWidth
+    if (cursorPos?.rowIndex) {
+      const currentRow = rowList[cursorPos.rowIndex]
+      const firstElement = currentRow.elementList[0]
+      // 宽度足的行，包括一开始就带缩进的和一开始就是普通行的行
+      if (!currentRow.isWidthNotEnough) {
+        if (!firstElement.leftIndent?.width) {
+          firstElement.leftIndent = {
+            ...(firstElement?.leftIndent || {}),
+            width: 0
+          }
+        }
+        firstElement.type = ElementType.LEFT_INDENT
+        firstElement.leftIndent.width! += width || defaultTabWidth
+        if (firstElement.leftIndent.width! > innerWidth) {
+          firstElement.leftIndent.width! = innerWidth
+        }
+      }
+      // 宽度不足的行，向上寻找缩进
+      if (currentRow.isWidthNotEnough) {
+        let i = cursorPos.rowIndex
+        let preLeftIndentElement: IElement | null = null
+        while (i >= 0) {
+          const preElement = rowList[i].elementList[0]
+          if (
+            preElement.type === ElementType.LEFT_INDENT &&
+            preElement.leftIndent?.width
+          ) {
+            preLeftIndentElement = preElement
+            break
+          }
+          i--
+        }
+        if (
+          preLeftIndentElement &&
+          typeof preLeftIndentElement.leftIndent?.width === 'number'
+        ) {
+          preLeftIndentElement.leftIndent.width += width || defaultTabWidth
+          if (preLeftIndentElement.leftIndent.width > innerWidth) {
+            preLeftIndentElement.leftIndent.width = innerWidth
+          }
+        }
+      }
+    }
+    this.draw.render({
+      curIndex: cursorPos?.index,
+      isSubmitHistory: true
+    })
+  }
+
+  public minusLeftIndentWidth(width?: number) {
+    const cursorPos = this.position.getCursorPosition()
+    const rowList = this.draw.getRowList()
+    const defaultTabWidth = this.draw.getOptions().defaultTabWidth
+    if (cursorPos?.rowIndex) {
+      const currentRow = rowList[cursorPos.rowIndex]
+      const firstElement = currentRow.elementList[0]
+      if (
+        firstElement.leftIndent &&
+        typeof firstElement.leftIndent?.width === 'number'
+      ) {
+        firstElement.leftIndent.width -= width || defaultTabWidth
+        if (firstElement.leftIndent.width < 0) {
+          firstElement.leftIndent.width = 0
+        }
+      } else {
+        let i = cursorPos.rowIndex
+        let preLeftIndentElement: IElement | null = null
+        while (i >= 0) {
+          const preElement = rowList[i].elementList[0]
+          if (
+            preElement.type === ElementType.LEFT_INDENT &&
+            preElement.leftIndent?.width
+          ) {
+            preLeftIndentElement = preElement
+            break
+          }
+          i--
+        }
+        if (
+          preLeftIndentElement &&
+          typeof preLeftIndentElement.leftIndent?.width === 'number'
+        ) {
+          preLeftIndentElement.leftIndent.width -= width || defaultTabWidth
+          if (preLeftIndentElement.leftIndent.width < 0) {
+            preLeftIndentElement.leftIndent.width = 0
+          }
+        }
+      }
+    }
+    this.draw.render({
+      curIndex: cursorPos?.index,
+      isSubmitHistory: true
+    })
+  }
+
   public appendElementList(
     elementList: IElement[],
     options?: IAppendElementListOption
