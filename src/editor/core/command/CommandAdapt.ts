@@ -1768,7 +1768,7 @@ export class CommandAdapt {
     this.draw.insertElementList(cloneElementList, options)
   }
 
-  public addLeftIndentWidth(width?: number) {
+  public increaseLeftIndentWidth(width?: number) {
     const innerWidth = this.draw.getInnerWidth()
     const cursorPos = this.position.getCursorPosition()
     const rowList = this.draw.getRowList()
@@ -1786,8 +1786,8 @@ export class CommandAdapt {
         }
         firstElement.type = ElementType.LEFT_INDENT
         firstElement.leftIndent.width! += width || defaultTabWidth
-        if (firstElement.leftIndent.width! > innerWidth) {
-          firstElement.leftIndent.width! = innerWidth
+        if (firstElement.leftIndent.width! + currentRow.width > innerWidth) {
+          firstElement.leftIndent.width! = innerWidth - currentRow.width
         }
       }
       // 宽度不足的行，向上寻找缩进
@@ -1822,7 +1822,7 @@ export class CommandAdapt {
     })
   }
 
-  public minusLeftIndentWidth(width?: number) {
+  public decreaseLeftIndentWidth(width?: number) {
     const cursorPos = this.position.getCursorPosition()
     const rowList = this.draw.getRowList()
     const defaultTabWidth = this.draw.getOptions().defaultTabWidth

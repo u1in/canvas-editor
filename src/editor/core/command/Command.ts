@@ -82,8 +82,8 @@ export class Command {
   public executeSetMainBadge: CommandAdapt['setMainBadge']
   public executeSetAreaBadge: CommandAdapt['setAreaBadge']
   public executeInsertElementList: CommandAdapt['insertElementList']
-  public executeAddLeftIndentWidth: CommandAdapt['addLeftIndentWidth']
-  public executeMinusLeftIndentWidth: CommandAdapt['minusLeftIndentWidth']
+  public executeIncreaseLeftIndentWidth: CommandAdapt['increaseLeftIndentWidth']
+  public executeDecreaseLeftIndentWidth: CommandAdapt['decreaseLeftIndentWidth']
   public executeInsertArea: CommandAdapt['insertArea']
   public executeSetAreaProperties: CommandAdapt['setAreaProperties']
   public executeLocationArea: CommandAdapt['locationArea']
@@ -238,8 +238,8 @@ export class Command {
     this.executeLocationArea = adapt.locationArea.bind(adapt)
     // 通用
     this.executeInsertElementList = adapt.insertElementList.bind(adapt)
-    this.executeAddLeftIndentWidth = adapt.addLeftIndentWidth.bind(adapt)
-    this.executeMinusLeftIndentWidth = adapt.minusLeftIndentWidth.bind(adapt)
+    this.executeIncreaseLeftIndentWidth = adapt.increaseLeftIndentWidth.bind(adapt)
+    this.executeDecreaseLeftIndentWidth = adapt.decreaseLeftIndentWidth.bind(adapt)
     this.executeAppendElementList = adapt.appendElementList.bind(adapt)
     this.executeUpdateElementById = adapt.updateElementById.bind(adapt)
     this.executeDeleteElementById = adapt.deleteElementById.bind(adapt)
