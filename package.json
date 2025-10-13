@@ -37,6 +37,7 @@
     "dev": "vite",
     "lib": "npm run lint && tsc && vite build --mode lib",
     "build": "npm run lint && tsc && vite build --mode app",
+    "update": "npm run lib && yalc push",
     "serve": "vite preview",
     "lint": "eslint .",
     "cypress:open": "cypress open",
