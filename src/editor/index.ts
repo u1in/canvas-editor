@@ -28,7 +28,11 @@ import {
   WordBreak,
   RenderMode
 } from './dataset/enum/Editor'
-import { EDITOR_CLIPBOARD, EDITOR_COMPONENT } from './dataset/constant/Editor'
+import {
+  EDITOR_CLIPBOARD,
+  EDITOR_COMPONENT,
+  EDITOR_PREFIX
+} from './dataset/constant/Editor'
 import { IWatermark } from './interface/Watermark'
 import {
   ControlComponent,
@@ -164,7 +168,8 @@ export {
   splitText,
   createDomFromElementList,
   getElementListByHTML,
-  getTextFromElementList
+  getTextFromElementList,
+  deepClone
 }
 
 // 对外常量
@@ -173,7 +178,8 @@ export {
   LETTER_CLASS,
   INTERNAL_CONTEXT_MENU_KEY,
   INTERNAL_SHORTCUT_KEY,
-  EDITOR_CLIPBOARD
+  EDITOR_CLIPBOARD,
+  EDITOR_PREFIX
 }
 
 // 对外枚举
