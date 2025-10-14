@@ -1775,45 +1775,37 @@ export class CommandAdapt {
     const defaultTabWidth = this.draw.getOptions().defaultTabWidth
     if (cursorPos?.rowIndex) {
       const currentRow = rowList[cursorPos.rowIndex]
-      const firstElement = currentRow.elementList[0]
-      // 宽度足的行，包括一开始就带缩进的和一开始就是普通行的行
-      if (!currentRow.isWidthNotEnough) {
-        if (!firstElement.leftIndent?.width) {
-          firstElement.leftIndent = {
-            ...(firstElement?.leftIndent || {}),
-            width: 0
-          }
-        }
-        firstElement.type = ElementType.LEFT_INDENT
-        firstElement.leftIndent.width! += width || defaultTabWidth
-        if (firstElement.leftIndent.width! + currentRow.width > innerWidth) {
-          firstElement.leftIndent.width! = innerWidth - currentRow.width
-        }
-      }
-      // 宽度不足的行，向上寻找缩进
-      if (currentRow.isWidthNotEnough) {
-        let i = cursorPos.rowIndex
-        let preLeftIndentElement: IElement | null = null
-        while (i >= 0) {
-          const preElement = rowList[i].elementList[0]
-          if (
-            preElement.type === ElementType.LEFT_INDENT &&
-            preElement.leftIndent?.width
-          ) {
-            preLeftIndentElement = preElement
+      const preRow =
+        cursorPos.rowIndex - 1 >= 0 ? rowList[cursorPos.rowIndex - 1] : null
+      let firstElement = currentRow.elementList[0]
+      // 换行下来的行，先找到行首
+      if (preRow && preRow.isWidthNotEnough) {
+        // 找到宽度不足的行行首
+        let i = cursorPos.rowIndex - 1
+        while (i >= 1) {
+          firstElement = rowList[i].elementList[0]
+          // 向前找到第一个没有跨行的行，下一行就是光标所在行行首
+          if (!rowList[i].isWidthNotEnough) {
+            i = i + 1
+            firstElement = rowList[i].elementList[0]
             break
           }
           i--
         }
-        if (
-          preLeftIndentElement &&
-          typeof preLeftIndentElement.leftIndent?.width === 'number'
-        ) {
-          preLeftIndentElement.leftIndent.width += width || defaultTabWidth
-          if (preLeftIndentElement.leftIndent.width > innerWidth) {
-            preLeftIndentElement.leftIndent.width = innerWidth
-          }
+      }
+      // 找到行首元素，赋予偏移量
+      if (!firstElement.leftIndent?.width) {
+        firstElement.leftIndent = {
+          ...(firstElement?.leftIndent || {}),
+          width: 0
         }
+      }
+      if (firstElement.type === undefined && firstElement.value === ZERO) {
+        firstElement.type = ElementType.LEFT_INDENT
+      }
+      firstElement.leftIndent.width! += width || defaultTabWidth
+      if (firstElement.leftIndent.width! + currentRow.width > innerWidth) {
+        firstElement.leftIndent.width! = innerWidth - currentRow.width
       }
     }
     this.draw.render({
@@ -1828,38 +1820,37 @@ export class CommandAdapt {
     const defaultTabWidth = this.draw.getOptions().defaultTabWidth
     if (cursorPos?.rowIndex) {
       const currentRow = rowList[cursorPos.rowIndex]
-      const firstElement = currentRow.elementList[0]
-      if (
-        firstElement.leftIndent &&
-        typeof firstElement.leftIndent?.width === 'number'
-      ) {
-        firstElement.leftIndent.width -= width || defaultTabWidth
-        if (firstElement.leftIndent.width < 0) {
-          firstElement.leftIndent.width = 0
-        }
-      } else {
-        let i = cursorPos.rowIndex
-        let preLeftIndentElement: IElement | null = null
-        while (i >= 0) {
-          const preElement = rowList[i].elementList[0]
-          if (
-            preElement.type === ElementType.LEFT_INDENT &&
-            preElement.leftIndent?.width
-          ) {
-            preLeftIndentElement = preElement
+      const preRow =
+        cursorPos.rowIndex - 1 >= 0 ? rowList[cursorPos.rowIndex - 1] : null
+      let firstElement = currentRow.elementList[0]
+      // 换行下来的行，先找到行首
+      if (preRow && preRow.isWidthNotEnough) {
+        // 找到宽度不足的行行首
+        let i = cursorPos.rowIndex - 1
+        while (i >= 1) {
+          firstElement = rowList[i].elementList[0]
+          // 向前找到第一个没有跨行的行，下一行就是光标所在行行首
+          if (!rowList[i].isWidthNotEnough) {
+            i = i + 1
+            firstElement = rowList[i].elementList[0]
             break
           }
           i--
         }
-        if (
-          preLeftIndentElement &&
-          typeof preLeftIndentElement.leftIndent?.width === 'number'
-        ) {
-          preLeftIndentElement.leftIndent.width -= width || defaultTabWidth
-          if (preLeftIndentElement.leftIndent.width < 0) {
-            preLeftIndentElement.leftIndent.width = 0
-          }
+      }
+      // 找到行首元素，赋予偏移量
+      if (!firstElement.leftIndent?.width) {
+        firstElement.leftIndent = {
+          ...(firstElement?.leftIndent || {}),
+          width: 0
         }
+      }
+      if (firstElement.type === undefined && firstElement.value === ZERO) {
+        firstElement.type = ElementType.LEFT_INDENT
+      }
+      firstElement.leftIndent.width! -= width || defaultTabWidth
+      if (firstElement.leftIndent.width! < 0) {
+        firstElement.leftIndent.width! = 0
       }
     }
     this.draw.render({
