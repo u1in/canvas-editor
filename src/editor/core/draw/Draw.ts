@@ -1904,28 +1904,17 @@ export class Draw {
           row.listIndex = listIndex
         }
         // 宽度不足继承左缩进
-        if (isWidthNotEnough) {
-          // 找到上一个leftIndent
-          let preLeftIndentElement: IElement | null = null
-          let i = rowList.length - 1
-          while (i >= 0) {
-            const preRow = rowList[i]
-            if (preRow.elementList[0].type === ElementType.LEFT_INDENT) {
-              preLeftIndentElement = preRow.elementList[0]
-              break
-            }
-            i--
-          }
-          row.offsetX = preLeftIndentElement?.leftIndent?.width || 0
+        if (isWrap && !isForceBreak) {
+          // 继承上一行的左缩进
+          const preRow = rowList[rowList.length - 1]
+          row.offsetX = preRow.offsetX || 0
         }
         // 新起一行的左缩进
-        if (
-          !isWidthNotEnough &&
-          element.type === ElementType.LEFT_INDENT &&
-          element.leftIndent?.width
-        ) {
+        // 取第一个元素的左缩进
+        if (isWrap && isForceBreak) {
           row.offsetX = element.leftIndent?.width || 0
         }
+
         // Y轴偏移量
         row.offsetY =
           !isFromTable &&
