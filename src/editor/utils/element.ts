@@ -705,7 +705,7 @@ export function zipElementList(
       const leftIndent = element.leftIndent
       const leftIndentElement: IElement = {
         type: ElementType.LEFT_INDENT,
-        value: '',
+        value: ZERO,
         leftIndent
       }
       element = leftIndentElement
