@@ -1936,7 +1936,7 @@ export class Draw {
           // MODIFY 新增一项配置，允许垂直布局
           if (
             !element.hide &&
-            element.type === ElementType.IMAGE &&
+            element.type === ElementType.LATEX &&
             element.allowVerticalLayout
           ) {
             // 基线文字测量信息

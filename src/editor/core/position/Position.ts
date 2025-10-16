@@ -159,12 +159,8 @@ export class Position {
         // MODIFY 新增一项配置，允许垂直布局
         offsetY =
           !element.hide &&
-          element.type === ElementType.IMAGE &&
-          element.allowVerticalLayout &&
-          // MODIFY 全部图片为垂直布局时候，才进行垂直布局
-          curRow.elementList.every(item =>
-            item.type !== ElementType.IMAGE ? true : item.allowVerticalLayout
-          )
+          element.type === ElementType.LATEX &&
+          element.allowVerticalLayout
             ? (curRow.height - element.height!) / 2
             : offsetY
         // MODIFY 添加新api 位置偏移量
