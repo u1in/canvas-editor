@@ -700,7 +700,7 @@ export function zipElementList(
         titleElement.valueList = zipElementList(valueList, options)
         element = titleElement
       }
-    } else if (element.leftIndent) {
+    } else if (element.leftIndent && element.value === ZERO) {
       // 左缩进处理
       const leftIndent = element.leftIndent
       const leftIndentElement: IElement = {
