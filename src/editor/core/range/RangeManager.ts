@@ -388,10 +388,10 @@ export class RangeManager {
     const startElement = elementList[startIndex]
     if (startIndex === endIndex) {
       return (
-        (startElement.controlComponent !== ControlComponent.PRE_TEXT ||
+        (startElement?.controlComponent !== ControlComponent.PRE_TEXT ||
           elementList[startIndex + 1]?.controlComponent !==
             ControlComponent.PRE_TEXT) &&
-        startElement.controlComponent !== ControlComponent.POST_TEXT
+        startElement?.controlComponent !== ControlComponent.POST_TEXT
       )
     }
     const endElement = elementList[endIndex]
