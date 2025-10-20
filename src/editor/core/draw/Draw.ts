@@ -1914,6 +1914,15 @@ export class Draw {
         if (isWrap && isForceBreak) {
           row.offsetX = element.leftIndent?.width || 0
         }
+        if (isWrap && element.type === ElementType.TABLE) {
+          const preRow = rowList[rowList.length - 1]
+          if (!element.leftIndent?.width) {
+            element.leftIndent = {
+              width: preRow.offsetX || 0
+            }
+          }
+          row.offsetX = element.leftIndent?.width
+        }
 
         // Y轴偏移量
         row.offsetY =
