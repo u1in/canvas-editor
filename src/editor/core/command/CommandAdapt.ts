@@ -1770,7 +1770,12 @@ export class CommandAdapt {
 
   public increaseLeftIndentWidth(width?: number) {
     const innerWidth = this.draw.getInnerWidth()
-    const cursorPos = this.position.getCursorPosition()
+    const context = this.position.getPositionContext()
+    const positionList = this.position.getOriginalPositionList()
+    const elementList = this.draw.getOriginalMainElementList()
+    if (!context.index) return
+    const cursorPos = positionList[context.index]
+    const cursorEle = elementList[cursorPos.index]
     const rowList = this.draw.getRowList()
     const defaultTabWidth = this.draw.getOptions().defaultTabWidth
     if (cursorPos?.rowIndex) {
@@ -1804,8 +1809,22 @@ export class CommandAdapt {
         firstElement.type = ElementType.LEFT_INDENT
       }
       firstElement.leftIndent.width! += width || defaultTabWidth
-      if (firstElement.leftIndent.width! + currentRow.width > innerWidth) {
+      if (
+        cursorEle.type !== ElementType.TABLE &&
+        firstElement.leftIndent.width! + currentRow.width > innerWidth
+      ) {
         firstElement.leftIndent.width! = innerWidth - currentRow.width
+      }
+      if (cursorEle.type === ElementType.TABLE) {
+        firstElement.width = innerWidth - firstElement.leftIndent.width!
+        if (!firstElement.colgroup?.length) {
+          firstElement.colgroup = []
+        }
+        firstElement.colgroup.forEach(col => {
+          col.width =
+            (innerWidth - firstElement.leftIndent!.width!) /
+            firstElement.colgroup!.length
+        })
       }
     }
     this.draw.render({
@@ -1815,7 +1834,13 @@ export class CommandAdapt {
   }
 
   public decreaseLeftIndentWidth(width?: number) {
-    const cursorPos = this.position.getCursorPosition()
+    const innerWidth = this.draw.getInnerWidth()
+    const context = this.position.getPositionContext()
+    const positionList = this.position.getOriginalPositionList()
+    const elementList = this.draw.getOriginalMainElementList()
+    if (!context.index) return
+    const cursorPos = positionList[context.index]
+    const cursorEle = elementList[cursorPos.index]
     const rowList = this.draw.getRowList()
     const defaultTabWidth = this.draw.getOptions().defaultTabWidth
     if (cursorPos?.rowIndex) {
@@ -1851,6 +1876,17 @@ export class CommandAdapt {
       firstElement.leftIndent.width! -= width || defaultTabWidth
       if (firstElement.leftIndent.width! < 0) {
         firstElement.leftIndent.width! = 0
+      }
+      if (cursorEle.type === ElementType.TABLE) {
+        firstElement.width = innerWidth - firstElement.leftIndent.width!
+        if (!firstElement.colgroup?.length) {
+          firstElement.colgroup = []
+        }
+        firstElement.colgroup.forEach(col => {
+          col.width =
+            (innerWidth - firstElement.leftIndent!.width!) /
+            firstElement.colgroup!.length
+        })
       }
     }
     this.draw.render({
