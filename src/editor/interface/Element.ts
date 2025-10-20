@@ -158,11 +158,6 @@ export interface IPosOffset {
   }
 }
 
-// MODIFY 添加新api meta存放元信息
-export interface IElementMeta {
-  meta?: any
-}
-
 // MODIFY 添加新api 垂直布局
 export interface IAllowVerticalLayout {
   allowVerticalLayout?: boolean
@@ -196,7 +191,6 @@ export type IElement = IElementBasic &
   IListElement &
   IAreaElement &
   IAllowVerticalLayout &
-  IElementMeta &
   IPosOffset &
   ILeftIndentElement
 
