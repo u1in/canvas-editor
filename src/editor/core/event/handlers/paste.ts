@@ -61,7 +61,12 @@ export function pasteElement(host: CanvasEvent, elementList: IElement[]) {
       editorOptions: draw.getOptions()
     })
   }
-  draw.insertElementList(elementList)
+  // 调用beforeInsert钩子，如果返回false则取消插入
+  const beforeInsert = draw.getBeforeInsert()
+  const allowInsert = beforeInsert(elementList, 'paste') !== false
+  if (allowInsert) {
+    draw.insertElementList(elementList)
+  }
 }
 
 export function pasteHTML(host: CanvasEvent, htmlText: string) {
@@ -99,7 +104,12 @@ export function pasteImage(host: CanvasEvent, file: File | Blob) {
           editorOptions: draw.getOptions()
         })
       }
-      draw.insertElementList([imageElement])
+      // 调用beforeInsert钩子，如果返回false则取消插入
+      const beforeInsert = draw.getBeforeInsert()
+      const allowInsert = beforeInsert([imageElement], 'paste') !== false
+      if (allowInsert) {
+        draw.insertElementList([imageElement])
+      }
     }
   }
 }

@@ -35,6 +35,15 @@ export async function cut(host: CanvasEvent) {
   await writeElementList(elementList.slice(start + 1, end + 1), options)
   const control = draw.getControl()
   let curIndex: number
+  
+  // 获取要删除的元素
+  const deletedElements = elementList.slice(start + 1, end + 1)
+  
+  // 调用beforeDelete钩子，如果返回false则取消删除
+  const beforeDelete = draw.getBeforeDelete()
+  const allowDelete = beforeDelete(deletedElements, 'cut') !== false
+  if (!allowDelete) return
+  
   if (control.getActiveControl() && control.getIsRangeWithinControl()) {
     curIndex = control.cut()
     control.emitControlContentChange()

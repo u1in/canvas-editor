@@ -85,6 +85,12 @@ export function input(data: string, host: CanvasEvent) {
   // 控件-移除placeholder
   const control = draw.getControl()
   let curIndex: number
+  
+  // 调用beforeInsert钩子，如果返回false则取消插入
+  const beforeInsert = draw.getBeforeInsert()
+  const allowInsert = beforeInsert(inputData, 'input') !== false
+  if (!allowInsert) return
+  
   if (control.getActiveControl() && control.getIsRangeWithinControl()) {
     curIndex = control.setValue(inputData)
     if (!isComposing) {

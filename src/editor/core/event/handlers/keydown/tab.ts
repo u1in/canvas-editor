@@ -36,6 +36,11 @@ export function tab(evt: KeyboardEvent, host: CanvasEvent) {
     formatElementContext(elementList, [tabElement], startIndex, {
       editorOptions: draw.getOptions()
     })
-    draw.insertElementList([tabElement])
+    // 调用beforeInsert钩子，如果返回false则取消插入
+    const beforeInsert = draw.getBeforeInsert()
+    const allowInsert = beforeInsert([tabElement], 'tab') !== false
+    if (allowInsert) {
+      draw.insertElementList([tabElement])
+    }
   }
 }

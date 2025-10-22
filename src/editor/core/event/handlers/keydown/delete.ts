@@ -9,9 +9,9 @@ function deleteHideElement(host: CanvasEvent) {
   const elementList = draw.getElementList()
   const nextElement = elementList[range.startIndex + 1]
   if (
-    !nextElement.hide &&
-    !nextElement.control?.hide &&
-    !nextElement.area?.hide
+    !nextElement?.hide &&
+    !nextElement?.control?.hide &&
+    !nextElement?.area?.hide
   ) {
     return
   }
@@ -20,6 +20,12 @@ function deleteHideElement(host: CanvasEvent) {
   while (index < elementList.length) {
     const element = elementList[index]
     let newIndex: number | null = null
+    
+    // 调用beforeDelete钩子，如果返回false则取消删除
+    const beforeDelete = draw.getBeforeDelete()
+    const allowDelete = beforeDelete([element], 'delete') !== false
+    if (!allowDelete) break
+    
     if (element.controlId) {
       newIndex = draw.getControl().removeControl(index)
     } else {
@@ -45,6 +51,7 @@ export function del(evt: KeyboardEvent, host: CanvasEvent) {
   const { startIndex, endIndex, isCrossRowCol } = rangeManager.getRange()
   // 隐藏控件删除
   const elementList = draw.getElementList()
+  const beforeDelete = draw.getBeforeDelete()
   const control = draw.getControl()
   if (rangeManager.getIsCollapsed()) {
     deleteHideElement(host)
@@ -54,18 +61,23 @@ export function del(evt: KeyboardEvent, host: CanvasEvent) {
   if (isCrossRowCol) {
     // 表格跨行列选中时清空单元格内容
     const rowCol = draw.getTableParticle().getRangeRowCol()
-    if (!rowCol) return
-    let isDeleted = false
-    for (let r = 0; r < rowCol.length; r++) {
-      const row = rowCol[r]
-      for (let c = 0; c < row.length; c++) {
-        const col = row[c]
-        if (col.value.length > 1) {
-          draw.spliceElementList(col.value, 1, col.value.length - 1)
-          isDeleted = true
+      if (!rowCol) return
+      let isDeleted = false
+      for (let r = 0; r < rowCol.length; r++) {
+        const row = rowCol[r]
+        for (let c = 0; c < row.length; c++) {
+          const col = row[c]
+          if (col.value.length > 1) {
+            // 调用beforeDelete钩子，如果返回false则取消删除
+            const deletedElements = col.value.slice(1, col.value.length)
+            const allowDelete = beforeDelete(deletedElements, 'delete') !== false 
+            if (allowDelete) {
+              draw.spliceElementList(col.value, 1, col.value.length - 1)
+              isDeleted = true
+            }
+          }
         }
       }
-    }
     // 删除成功后定位
     curIndex = isDeleted ? 0 : null
   } else if (control.getActiveControl() && control.getIsRangeWithinControl()) {
@@ -75,33 +87,62 @@ export function del(evt: KeyboardEvent, host: CanvasEvent) {
       control.emitControlContentChange()
     }
   } else if (elementList[endIndex + 1]?.controlId) {
-    // 光标在控件前
-    curIndex = control.removeControl(endIndex + 1)
-  } else {
-    // 普通元素
-    const position = draw.getPosition()
-    const cursorPosition = position.getCursorPosition()
-    if (!cursorPosition) return
-    const { index } = cursorPosition
-    // 命中图片直接删除
-    const positionContext = position.getPositionContext()
-    if (positionContext.isDirectHit && positionContext.isImage) {
-      draw.spliceElementList(elementList, index, 1)
-      curIndex = index - 1
-    } else {
-      const isCollapsed = rangeManager.getIsCollapsed()
-      if (!isCollapsed) {
-        draw.spliceElementList(
-          elementList,
-          startIndex + 1,
-          endIndex - startIndex
-        )
+      // 光标在控件前
+      // 调用beforeDelete钩子，如果返回false则取消删除
+      const element = elementList[endIndex + 1]
+      const allowDelete = beforeDelete([element], 'delete') !== false
+      if (allowDelete) {
+        curIndex = control.removeControl(endIndex + 1)
       } else {
-        if (!elementList[index + 1]) return
-        draw.spliceElementList(elementList, index + 1, 1)
+        curIndex = null
       }
-      curIndex = isCollapsed ? index : startIndex
-    }
+    } else {
+      // 普通元素
+      const position = draw.getPosition()
+      const cursorPosition = position.getCursorPosition()
+      if (!cursorPosition) return
+      const { index } = cursorPosition
+      // 命中图片直接删除
+      const positionContext = position.getPositionContext()
+      if (positionContext.isDirectHit && positionContext.isImage) {
+        // 调用beforeDelete钩子，如果返回false则取消删除
+        const element = elementList[index]
+        const allowDelete = beforeDelete([element], 'delete') !== false
+        if (allowDelete) {
+          draw.spliceElementList(elementList, index, 1)
+          curIndex = index - 1
+        } else {
+          curIndex = null
+        }
+      } else {
+        const isCollapsed = rangeManager.getIsCollapsed()
+        if (!isCollapsed) {
+          // 调用beforeDelete钩子，如果返回false则取消删除
+          const deletedElements = elementList.slice(startIndex + 1, endIndex + 1)
+          const allowDelete = beforeDelete(deletedElements, 'delete') !== false
+          if (allowDelete) {
+            draw.spliceElementList(
+              elementList,
+              startIndex + 1,
+              endIndex - startIndex
+            )
+            curIndex = startIndex
+          } else {
+            curIndex = null
+          }
+        } else {
+          if (!elementList[index + 1]) return
+          // 调用beforeDelete钩子，如果返回false则取消删除
+          const element = elementList[index + 1]
+          const allowDelete = beforeDelete([element], 'delete') !== false
+          if (allowDelete) {
+            draw.spliceElementList(elementList, index + 1, 1)
+            curIndex = index
+          } else {
+            curIndex = null
+          }
+        }
+      }
   }
   draw.getGlobalEvent().setCanvasEventAbility()
   if (curIndex === null) {

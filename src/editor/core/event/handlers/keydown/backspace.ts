@@ -4,27 +4,43 @@ import { CanvasEvent } from '../../CanvasEvent'
 // 删除光标前隐藏元素
 function backspaceHideElement(host: CanvasEvent) {
   const draw = host.getDraw()
+  // 提前获取 beforeDelete 回调
+  const beforeDelete = draw.getBeforeDelete()
+
   const rangeManager = draw.getRange()
   const range = rangeManager.getRange()
   // 光标所在位置为隐藏元素时触发循环删除
   const elementList = draw.getElementList()
   const element = elementList[range.startIndex]
   if (!element.hide && !element.control?.hide && !element.area?.hide) return
+
   // 向前删除所有隐藏元素
   let index = range.startIndex
   while (index > 0) {
     const element = elementList[index]
     let newIndex: number | null = null
+
+    // 检查是否允许删除
+    let allowDelete = true
+    if (beforeDelete && !element.controlId) {
+      const deletedElements = [element]
+      allowDelete = beforeDelete(deletedElements, 'backspace') !== false
+    }
+
     if (element.controlId) {
       newIndex = draw.getControl().removeControl(index)
       if (newIndex !== null) {
         index = newIndex
       }
-    } else {
+    } else if (allowDelete) {
       draw.spliceElementList(elementList, index, 1)
       newIndex = index - 1
       index--
+    } else {
+      // 如果不允许删除，中断循环
+      break
     }
+
     const newElement = elementList[newIndex!]
     if (
       !newElement ||
@@ -56,9 +72,38 @@ export function backspace(evt: KeyboardEvent, host: CanvasEvent) {
   if (rangeManager.getIsCollapsed()) {
     backspaceHideElement(host)
   }
+
+  // 提前获取 beforeDelete 回调并检查
+  const beforeDelete = draw.getBeforeDelete()
+  const elementList = draw.getElementList()
+  const isCollapsed = rangeManager.getIsCollapsed()
+  const { startIndex, endIndex, isCrossRowCol } = rangeManager.getRange()
+  const cursorPosition = draw.getPosition().getCursorPosition()
+
+  // 如果有 beforeDelete 回调，提前检查是否允许删除
+  if (beforeDelete && cursorPosition) {
+    const { index } = cursorPosition
+    let allowDelete = true
+
+    if (!isCollapsed) {
+      // 选择删除时的元素
+      const deletedElements = elementList.slice(startIndex + 1, endIndex + 1)
+      allowDelete = beforeDelete(deletedElements, 'backspace') !== false
+    } else if (index < elementList.length) {
+      // 光标删除时的元素
+      const deletedElements = [elementList[index]]
+      allowDelete = beforeDelete(deletedElements, 'backspace') !== false
+    }
+
+    // 如果不允许删除，直接返回
+    if (!allowDelete) {
+      evt.preventDefault()
+      return
+    }
+  }
+
   // 删除操作
   const control = draw.getControl()
-  const { startIndex, endIndex, isCrossRowCol } = rangeManager.getRange()
   let curIndex: number | null
   if (isCrossRowCol) {
     // 表格跨行列选中时清空单元格内容

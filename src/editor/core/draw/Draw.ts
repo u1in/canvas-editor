@@ -178,6 +178,10 @@ export class Draw {
   private scrollObserver: ScrollObserver
   private selectionObserver: SelectionObserver
   private imageObserver: ImageObserver
+  private beforeDelete: (deletedElements: IElement[], action: string) => boolean | void = () =>
+    true
+  private beforeInsert: (insertedElements: IElement[], action: string) => boolean | void = () =>
+    true
 
   private LETTER_REG: RegExp
   private WORD_LIKE_REG: RegExp
@@ -320,6 +324,26 @@ export class Draw {
       this.setEditorData(this.printModeData)
       this.printModeData = null
     }
+  }
+
+  public setBeforeDelete(
+    callback: (deletedElements: IElement[], action: string) => boolean | void
+  ) {
+    this.beforeDelete = callback
+  }
+
+  public getBeforeDelete(): (deletedElements: IElement[], action: string) => boolean | void {
+    return this.beforeDelete
+  }
+
+  public setBeforeInsert(
+    callback: (insertedElements: IElement[], action: string) => boolean | void
+  ) {
+    this.beforeInsert = callback
+  }
+
+  public getBeforeInsert(): (insertedElements: IElement[], action: string) => boolean | void {
+    return this.beforeInsert
   }
 
   public getLetterReg(): RegExp {
