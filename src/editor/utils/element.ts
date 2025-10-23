@@ -137,6 +137,7 @@ export function formatElementList(
       // 移除父节点
       elementList.splice(i, 1)
       elementList.splice(i, 0, {
+        ...el,
         value: ZERO,
         type: ElementType.LEFT_INDENT,
         leftIndent: el.leftIndent
@@ -708,6 +709,7 @@ export function zipElementList(
       // 左缩进处理
       const leftIndent = element.leftIndent
       const leftIndentElement: IElement = {
+        ...element,
         type: ElementType.LEFT_INDENT,
         value: ZERO,
         leftIndent
