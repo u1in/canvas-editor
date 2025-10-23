@@ -271,9 +271,7 @@ export function cloneProperty<T>(
     const property = properties[i]
     const value = sourceElement[property]
     if (value !== undefined) {
-      targetElement[property] = value
-    } else {
-      delete targetElement[property]
+      targetElement[property] = targetElement[property] || value
     }
   }
 }
