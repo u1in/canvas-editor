@@ -38,7 +38,6 @@ export interface IEditorData {
 
 export interface IEditorOption {
   mode?: EditorMode
-  lazyLoadDisabled?: boolean
   locale?: string
   defaultType?: string
   defaultColor?: string

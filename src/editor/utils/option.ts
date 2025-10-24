@@ -150,7 +150,6 @@ export function mergeOption(
 
   return {
     mode: EditorMode.EDIT,
-    lazyLoadDisabled: false,
     locale: 'zhCN',
     defaultType: 'TEXT',
     defaultColor: '#000000',

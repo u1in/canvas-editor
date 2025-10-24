@@ -2695,7 +2695,7 @@ export class Draw {
 
   public render(payload?: IDrawOption) {
     this.renderCount++
-    const { header, footer, lazyLoadDisabled } = this.options
+    const { header, footer } = this.options
     const {
       isSubmitHistory = true,
       isSetCursor = true,
@@ -2779,7 +2779,7 @@ export class Draw {
     }
     // 绘制元素
     // 连续页因为有高度的变化会导致canvas渲染空白，需立即渲染，否则会出现闪动
-    if (!lazyLoadDisabled && isLazy && isPagingMode) {
+    if (isLazy && isPagingMode) {
       this._lazyRender()
     } else {
       this._immediateRender()
