@@ -2884,6 +2884,22 @@ export class Draw {
   }
 
   public destroy() {
+    this.rowList = []
+    this.pageRowList = []
+    this.painterStyle = null
+    this.painterOptions = null
+    this.visiblePageNoList = []
+    this.elementList = []
+    this.printModeData = null
+
+    this.getPosition().setPositionList([])
+    this.getPosition().setFloatPositionList([])
+    this.historyManager.recovery()
+    this.imageParticle.clear()
+    this.imageObserver.clearAll()
+    this.lazyRenderIntersectionObserver?.disconnect()
+    this.lazyRenderIntersectionObserver = null
+
     this.container.remove()
     this.globalEvent.removeEvent()
     this.scrollObserver.removeEvent()
