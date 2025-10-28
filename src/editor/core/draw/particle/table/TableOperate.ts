@@ -51,7 +51,8 @@ export class TableOperate {
     const innerWidth = this.draw.getContextInnerWidth() - offsetX
     // colgroup
     const colgroup: IColgroup[] = []
-    const colWidth = innerWidth / col
+    const defaultBorderWidth = 1 // 临时解决方案，目前关于table边框的渲染还有一些问题，等待作者重构后再fix
+    const colWidth = (innerWidth - (col + 1) * defaultBorderWidth) / col
     for (let c = 0; c < col; c++) {
       colgroup.push({
         width: colWidth
