@@ -23,6 +23,10 @@ export class ImageParticle {
     this.floatImage = null
   }
 
+  public clear() {
+    this.imageCache.clear()
+  }
+
   public getOriginalMainImageList(): IElement[] {
     const imageList: IElement[] = []
     const getImageList = (elementList: IElement[]) => {
