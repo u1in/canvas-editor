@@ -1770,15 +1770,15 @@ export class CommandAdapt {
 
   public increaseLeftIndentWidth(width?: number) {
     const innerWidth = this.draw.getInnerWidth()
-    const context = this.position.getPositionContext()
+    const cursorPosition = this.position.getCursorPosition()
     const positionList = this.position.getOriginalPositionList()
     const elementList = this.draw.getOriginalMainElementList()
-    if (!context.index) return
-    const cursorPos = positionList[context.index]
+    if (cursorPosition?.index === undefined) return
+    const cursorPos = positionList[cursorPosition.index]
     const cursorEle = elementList[cursorPos.index]
     const rowList = this.draw.getRowList()
     const defaultTabWidth = this.draw.getOptions().defaultTabWidth
-    if (cursorPos?.rowIndex) {
+    if (cursorPos?.rowIndex !== undefined) {
       const currentRow = rowList[cursorPos.rowIndex]
       const preRow =
         cursorPos.rowIndex - 1 >= 0 ? rowList[cursorPos.rowIndex - 1] : null
@@ -1835,15 +1835,15 @@ export class CommandAdapt {
 
   public decreaseLeftIndentWidth(width?: number) {
     const innerWidth = this.draw.getInnerWidth()
-    const context = this.position.getPositionContext()
+    const cursorPosition = this.position.getCursorPosition()
     const positionList = this.position.getOriginalPositionList()
     const elementList = this.draw.getOriginalMainElementList()
-    if (!context.index) return
-    const cursorPos = positionList[context.index]
+    if (cursorPosition?.index === undefined) return
+    const cursorPos = positionList[cursorPosition.index]
     const cursorEle = elementList[cursorPos.index]
     const rowList = this.draw.getRowList()
     const defaultTabWidth = this.draw.getOptions().defaultTabWidth
-    if (cursorPos?.rowIndex) {
+    if (cursorPos?.rowIndex !== undefined) {
       const currentRow = rowList[cursorPos.rowIndex]
       const preRow =
         cursorPos.rowIndex - 1 >= 0 ? rowList[cursorPos.rowIndex - 1] : null
