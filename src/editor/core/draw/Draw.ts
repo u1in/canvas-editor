@@ -1935,8 +1935,10 @@ export class Draw {
         }
         // 新起一行的左缩进
         // 取第一个元素的左缩进
+        // 如果没有取上一行的左缩进
         if (isWrap && isForceBreak) {
-          row.offsetX = element.leftIndent?.width || 0
+          const preRow = rowList[rowList.length - 1]
+          row.offsetX = element.leftIndent?.width || preRow?.offsetX || 0
         }
         if (isWrap && element.type === ElementType.TABLE) {
           const preRow = rowList[rowList.length - 1]
