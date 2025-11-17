@@ -85,14 +85,15 @@ export function formatElementList(
   if (
     isForceCompensation ||
     (isHandleFirstElement &&
-      startElement?.type !== ElementType.LEFT_INDENT &&
       startElement?.type !== ElementType.LIST &&
       ((startElement?.type && startElement.type !== ElementType.TEXT) ||
         !START_LINE_BREAK_REG.test(startElement?.value)))
   ) {
-    elementList.unshift({
-      value: ZERO
-    })
+    if(startElement?.type !== ElementType.LEFT_INDENT) {
+      elementList.unshift({
+        value: ZERO
+      })
+    }
   }
   let i = 0
   while (i < elementList.length) {
