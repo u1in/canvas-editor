@@ -151,6 +151,7 @@ export function mousedown(evt: MouseEvent, host: CanvasEvent) {
     } else if (isDirectHitRadio && !isReadonly) {
       hitRadio(curElement, draw)
     } else if (
+      curElement?.controlComponent &&
       curElement.controlComponent === ControlComponent.VALUE &&
       (curElement.control?.type === ControlType.CHECKBOX ||
         curElement.control?.type === ControlType.RADIO)
