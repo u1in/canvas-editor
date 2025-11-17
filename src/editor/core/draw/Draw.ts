@@ -712,6 +712,10 @@ export class Draw {
     return this.elementList
   }
 
+  public setOriginalMainElementList(payload: IElement[]) {
+    this.elementList = payload
+  }
+
   public getFooterElementList(): IElement[] {
     return this.footer.getElementList()
   }
