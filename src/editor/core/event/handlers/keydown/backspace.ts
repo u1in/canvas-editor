@@ -1,4 +1,5 @@
 import { ZERO } from '../../../../dataset/constant/Common'
+import { ElementType } from '../../../../dataset/enum/Element'
 import { CanvasEvent } from '../../CanvasEvent'
 
 // 删除光标前隐藏元素
@@ -145,6 +146,16 @@ export function backspace(evt: KeyboardEvent, host: CanvasEvent) {
         // 取消首字符列表设置
         if (firstElement.listId) {
           draw.getListParticle().unsetList()
+        }
+        if (firstElement.type === ElementType.LEFT_INDENT) {
+          // 转为ZERO元素
+          delete firstElement.type
+          delete firstElement.leftIndent
+          
+          rangeManager.setRange(startIndex, startIndex)
+          draw.render({
+            curIndex: startIndex
+          })
         }
         evt.preventDefault()
         return
