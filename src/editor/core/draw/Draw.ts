@@ -178,10 +178,14 @@ export class Draw {
   private scrollObserver: ScrollObserver
   private selectionObserver: SelectionObserver
   private imageObserver: ImageObserver
-  private beforeDelete: (deletedElements: IElement[], action: string) => boolean | void = () =>
-    true
-  private beforeInsert: (insertedElements: IElement[], action: string) => boolean | void = () =>
-    true
+  private beforeDelete: (
+    deletedElements: IElement[],
+    action: string
+  ) => boolean | void = () => true
+  private beforeInsert: (
+    insertedElements: IElement[],
+    action: string
+  ) => boolean | void = () => true
 
   private LETTER_REG: RegExp
   private WORD_LIKE_REG: RegExp
@@ -332,7 +336,10 @@ export class Draw {
     this.beforeDelete = callback
   }
 
-  public getBeforeDelete(): (deletedElements: IElement[], action: string) => boolean | void {
+  public getBeforeDelete(): (
+    deletedElements: IElement[],
+    action: string
+  ) => boolean | void {
     return this.beforeDelete
   }
 
@@ -342,7 +349,10 @@ export class Draw {
     this.beforeInsert = callback
   }
 
-  public getBeforeInsert(): (insertedElements: IElement[], action: string) => boolean | void {
+  public getBeforeInsert(): (
+    insertedElements: IElement[],
+    action: string
+  ) => boolean | void {
     return this.beforeInsert
   }
 
