@@ -114,6 +114,7 @@ export class Command {
   public executeUpdateOptions: CommandAdapt['updateOptions']
   public executeInsertTitle: CommandAdapt['insertTitle']
   public executeFocus: CommandAdapt['focus']
+  public executeClearContent: CommandAdapt['clearContent']
   public getCatalog: CommandAdapt['getCatalog']
   public getImage: CommandAdapt['getImage']
   public getOptions: CommandAdapt['getOptions']
@@ -145,6 +146,7 @@ export class Command {
 
   constructor(adapt: CommandAdapt) {
     // 全局命令
+    this.executeClearContent = adapt.clearContent.bind(adapt)
     this.executeMode = adapt.mode.bind(adapt)
     this.executeCut = adapt.cut.bind(adapt)
     this.executeCopy = adapt.copy.bind(adapt)
