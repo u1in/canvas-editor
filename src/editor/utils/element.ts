@@ -1392,6 +1392,234 @@ export function createDomFromElementList(
   return clipboardDom
 }
 
+export function createDomFromElementListCopy(
+  elementList: IElement[],
+  options?: IEditorOption
+) {
+  const editorOptions = mergeOption(options)
+  function buildDom(payload: IElement[]): HTMLDivElement {
+    const clipboardDom = document.createElement('div')
+    for (let e = 0; e < payload.length; e++) {
+      const element = payload[e]
+      // 构造表格
+      if (element.type === ElementType.TABLE) {
+        const tableDom: HTMLTableElement = document.createElement('table')
+        tableDom.setAttribute('cellSpacing', '0')
+        tableDom.setAttribute('cellpadding', '0')
+        tableDom.setAttribute('border', '0')
+        const borderStyle = '1px solid #000000'
+        // 表格边框
+        if (!element.borderType || element.borderType === TableBorder.ALL) {
+          tableDom.style.borderTop = borderStyle
+          tableDom.style.borderLeft = borderStyle
+        } else if (element.borderType === TableBorder.EXTERNAL) {
+          tableDom.style.border = borderStyle
+        }
+        tableDom.style.width = `${element.width}px`
+        // colgroup
+        const colgroupDom = document.createElement('colgroup')
+        for (let c = 0; c < element.colgroup!.length; c++) {
+          const colgroup = element.colgroup![c]
+          const colDom = document.createElement('col')
+          colDom.setAttribute('width', `${colgroup.width}`)
+          colgroupDom.append(colDom)
+        }
+        tableDom.append(colgroupDom)
+        // tr
+        const trList = element.trList!
+        for (let t = 0; t < trList.length; t++) {
+          const trDom = document.createElement('tr')
+          const tr = trList[t]
+          trDom.style.height = `${tr.height}px`
+          for (let d = 0; d < tr.tdList.length; d++) {
+            const tdDom = document.createElement('td')
+            if (!element.borderType || element.borderType === TableBorder.ALL) {
+              tdDom.style.borderBottom = tdDom.style.borderRight = '1px solid'
+            }
+            const td = tr.tdList[d]
+            tdDom.colSpan = td.colspan
+            tdDom.rowSpan = td.rowspan
+            tdDom.style.verticalAlign = td.verticalAlign || 'top'
+            // 单元格边框
+            if (td.borderTypes?.includes(TdBorder.TOP)) {
+              tdDom.style.borderTop = borderStyle
+            }
+            if (td.borderTypes?.includes(TdBorder.RIGHT)) {
+              tdDom.style.borderRight = borderStyle
+            }
+            if (td.borderTypes?.includes(TdBorder.BOTTOM)) {
+              tdDom.style.borderBottom = borderStyle
+            }
+            if (td.borderTypes?.includes(TdBorder.LEFT)) {
+              tdDom.style.borderLeft = borderStyle
+            }
+            const childDom = createDomFromElementList(td.value!, options)
+            tdDom.innerHTML = childDom.innerHTML
+            if (td.backgroundColor) {
+              tdDom.style.backgroundColor = td.backgroundColor
+            }
+            trDom.append(tdDom)
+          }
+          tableDom.append(trDom)
+        }
+        clipboardDom.append(tableDom)
+      } else if (element.type === ElementType.HYPERLINK) {
+        const a = document.createElement('a')
+        a.innerText = element.valueList!.map(v => v.value).join('')
+        if (element.url) {
+          a.href = element.url
+        }
+        clipboardDom.append(a)
+      } else if (element.type === ElementType.TITLE) {
+        const h = document.createElement(
+          `h${titleOrderNumberMapping[element.level!]}`
+        )
+        const childDom = buildDom(element.valueList!)
+        h.innerHTML = childDom.innerHTML
+        clipboardDom.append(h)
+      } else if (element.type === ElementType.LIST) {
+        const list = document.createElement(
+          listTypeElementMapping[element.listType!]
+        )
+        if (element.listStyle) {
+          list.style.listStyleType = listStyleCSSMapping[element.listStyle]
+        }
+        // 按照换行符拆分
+        const zipList = zipElementList(element.valueList!)
+        const listElementListMap = splitListElement(zipList)
+        listElementListMap.forEach(listElementList => {
+          const li = document.createElement('li')
+          const childDom = buildDom(listElementList)
+          li.innerHTML = childDom.innerHTML
+          list.append(li)
+        })
+        clipboardDom.append(list)
+      } else if (element.type === ElementType.IMAGE) {
+        const img = document.createElement('img')
+        if (element.value) {
+          img.src = element.value
+          img.width = element.width!
+          img.height = element.height!
+        }
+        clipboardDom.append(img)
+      } else if (element.type === ElementType.BLOCK) {
+        if (element.block?.type === BlockType.VIDEO) {
+          const src = element.block.videoBlock?.src
+          if (src) {
+            const video = document.createElement('video')
+            video.style.display = 'block'
+            video.controls = true
+            video.src = src
+            video.width = element.width! || options?.width || window.innerWidth
+            video.height = element.height!
+            clipboardDom.append(video)
+          }
+        } else if (element.block?.type === BlockType.IFRAME) {
+          const { src, srcdoc } = element.block.iframeBlock || {}
+          if (src || srcdoc) {
+            const iframe = document.createElement('iframe')
+            iframe.sandbox.add(...IFrameBlock.sandbox)
+            iframe.style.display = 'block'
+            iframe.style.border = 'none'
+            if (src) {
+              iframe.src = src
+            } else if (srcdoc) {
+              iframe.srcdoc = srcdoc
+            }
+            iframe.width = `${
+              element.width || options?.width || window.innerWidth
+            }`
+            iframe.height = `${element.height!}`
+            clipboardDom.append(iframe)
+          }
+        }
+      } else if (element.type === ElementType.SEPARATOR) {
+        const hr = document.createElement('hr')
+        clipboardDom.append(hr)
+      } else if (element.type === ElementType.CHECKBOX) {
+        const checkbox = document.createElement('input')
+        checkbox.type = 'checkbox'
+        if (element.checkbox?.value) {
+          checkbox.setAttribute('checked', 'true')
+        }
+        clipboardDom.append(checkbox)
+      } else if (element.type === ElementType.RADIO) {
+        const radio = document.createElement('input')
+        radio.type = 'radio'
+        if (element.radio?.value) {
+          radio.setAttribute('checked', 'true')
+        }
+        clipboardDom.append(radio)
+      } else if (element.type === ElementType.TAB) {
+        const tab = document.createElement('span')
+        tab.innerHTML = `${NON_BREAKING_SPACE}${NON_BREAKING_SPACE}`
+        clipboardDom.append(tab)
+      } else if (element.type === ElementType.CONTROL) {
+        const controlElement = document.createElement('span')
+        const childDom = buildDom(element.control?.value || [])
+        controlElement.innerHTML = childDom.innerHTML
+        clipboardDom.append(controlElement)
+      } else if (
+        !element.type ||
+        element.type === ElementType.LATEX ||
+        TEXTLIKE_ELEMENT_TYPE.includes(element.type)
+      ) {
+        let text = ''
+        if (element.type === ElementType.DATE) {
+          text = element.valueList?.map(v => v.value).join('') || ''
+        } else {
+          text = element.value
+        }
+        if (!text) continue
+        const dom = convertElementToDom(element, editorOptions)
+        // 前一个元素是标题，移除首行换行符
+        if (payload[e - 1]?.type === ElementType.TITLE) {
+          text = text.replace(/^\n/, '')
+        }
+        dom.innerText = text.replace(new RegExp(`${ZERO}`, 'g'), '\n')
+        clipboardDom.append(dom)
+      }
+    }
+    return clipboardDom
+  }
+  // 按行布局分类创建dom
+  const clipboardDom = document.createElement('div')
+  const groupElementList = groupElementListByRowFlex(elementList)
+  for (let g = 0; g < groupElementList.length; g++) {
+    const elementGroupRowFlex = groupElementList[g]
+    // 行布局样式设置
+    const isDefaultRowFlex =
+      !elementGroupRowFlex.rowFlex ||
+      elementGroupRowFlex.rowFlex === RowFlex.LEFT
+    // 块元素使用flex否则使用text-align
+    const rowFlexDom = document.createElement('div')
+    if (!isDefaultRowFlex) {
+      const firstElement = elementGroupRowFlex.data[0]
+      if (getIsBlockElement(firstElement)) {
+        rowFlexDom.style.display = 'flex'
+        rowFlexDom.style.justifyContent = convertRowFlexToJustifyContent(
+          firstElement.rowFlex!
+        )
+      } else {
+        rowFlexDom.style.textAlign = convertRowFlexToTextAlign(
+          elementGroupRowFlex.rowFlex!
+        )
+      }
+    }
+    // 布局内容
+    rowFlexDom.innerHTML = buildDom(elementGroupRowFlex.data).innerHTML
+    // 未设置行布局时无需行布局容器
+    if (!isDefaultRowFlex) {
+      clipboardDom.append(rowFlexDom)
+    } else {
+      rowFlexDom.childNodes.forEach(child => {
+        clipboardDom.append(child.cloneNode(true))
+      })
+    }
+  }
+  return clipboardDom
+}
+
 export function convertTextNodeToElement(
   textNode: Element | Node
 ): IElement | null {
@@ -1442,6 +1670,246 @@ export interface IGetElementListByHTMLOption {
 }
 
 export function getElementListByHTML(
+  htmlText: string,
+  options: IGetElementListByHTMLOption
+): IElement[] {
+  const elementList: IElement[] = []
+  function findTextNode(dom: Element | Node) {
+    if (dom.nodeType === 3) {
+      const element = convertTextNodeToElement(dom)
+      if (element) {
+        elementList.push(element)
+      }
+    } else if (dom.nodeType === 1) {
+      const childNodes = dom.childNodes
+      for (let n = 0; n < childNodes.length; n++) {
+        const node = childNodes[n]
+        // br元素与display:block元素需换行
+        if (node.nodeName === 'BR') {
+          elementList.push({
+            value: '\n'
+          })
+        } else if (node.nodeName === 'A') {
+          const aElement = node as HTMLLinkElement
+          const value = aElement.innerText
+          if (value) {
+            elementList.push({
+              type: ElementType.HYPERLINK,
+              value: '',
+              valueList: [
+                {
+                  value
+                }
+              ],
+              url: aElement.href
+            })
+          }
+        } else if (/H[1-6]/.test(node.nodeName)) {
+          const hElement = node as HTMLTitleElement
+          const valueList = getElementListByHTML(
+            replaceHTMLElementTag(hElement, 'div').outerHTML,
+            options
+          )
+          elementList.push({
+            value: '',
+            type: ElementType.TITLE,
+            level: titleNodeNameMapping[node.nodeName],
+            valueList
+          })
+          if (
+            node.nextSibling &&
+            !INLINE_NODE_NAME.includes(node.nextSibling.nodeName)
+          ) {
+            elementList.push({
+              value: '\n'
+            })
+          }
+        } else if (node.nodeName === 'UL' || node.nodeName === 'OL') {
+          const listNode = node as HTMLOListElement | HTMLUListElement
+          const listElement: IElement = {
+            value: '',
+            type: ElementType.LIST,
+            valueList: []
+          }
+          if (node.nodeName === 'OL') {
+            listElement.listType = ListType.OL
+          } else {
+            listElement.listType = ListType.UL
+            listElement.listStyle = <ListStyle>(
+              (<unknown>listNode.style.listStyleType)
+            )
+          }
+          listNode.querySelectorAll('li').forEach(li => {
+            const liValueList = getElementListByHTML(li.innerHTML, options)
+            liValueList.forEach(list => {
+              if (list.value === '\n') {
+                list.listWrap = true
+              }
+            })
+            liValueList.unshift({
+              value: '\n'
+            })
+            listElement.valueList!.push(...liValueList)
+          })
+          elementList.push(listElement)
+        } else if (node.nodeName === 'HR') {
+          elementList.push({
+            value: '\n',
+            type: ElementType.SEPARATOR
+          })
+        } else if (node.nodeName === 'IMG') {
+          const { src, width, height } = node as HTMLImageElement
+          if (src && width && height) {
+            elementList.push({
+              width,
+              height,
+              value: src,
+              type: ElementType.IMAGE
+            })
+          }
+        } else if (node.nodeName === 'VIDEO') {
+          const { src, width, height } = node as HTMLVideoElement
+          if (src && width && height) {
+            elementList.push({
+              value: '',
+              type: ElementType.BLOCK,
+              block: {
+                type: BlockType.VIDEO,
+                videoBlock: {
+                  src
+                }
+              },
+              width,
+              height
+            })
+          }
+        } else if (node.nodeName === 'IFRAME') {
+          const { src, srcdoc, width, height } = node as HTMLIFrameElement
+          if ((src || srcdoc) && width && height) {
+            elementList.push({
+              value: '',
+              type: ElementType.BLOCK,
+              block: {
+                type: BlockType.IFRAME,
+                iframeBlock: {
+                  src,
+                  srcdoc
+                }
+              },
+              width: parseInt(width),
+              height: parseInt(height)
+            })
+          }
+        } else if (node.nodeName === 'TABLE') {
+          const tableElement = node as HTMLTableElement
+          const element: IElement = {
+            type: ElementType.TABLE,
+            value: '\n',
+            colgroup: [],
+            trList: []
+          }
+          // colgroup
+          const colElements = tableElement.querySelectorAll('colgroup col')
+          // 基础数据
+          tableElement.querySelectorAll('tr').forEach(trElement => {
+            const trHeightStr = window
+              .getComputedStyle(trElement)
+              .height.replace('px', '')
+            const tr: ITr = {
+              height: Number(trHeightStr),
+              tdList: []
+            }
+            trElement.querySelectorAll('th,td').forEach(tdElement => {
+              const tableCell = <HTMLTableCellElement>tdElement
+              const valueList = getElementListByHTML(
+                tableCell.innerHTML,
+                options
+              )
+              const td: ITd = {
+                colspan: tableCell.colSpan,
+                rowspan: tableCell.rowSpan,
+                value: valueList,
+                verticalAlign: window.getComputedStyle(tdElement)
+                  .verticalAlign as VerticalAlign,
+                width: parseFloat(window.getComputedStyle(tdElement).width)
+              }
+              if (tableCell.style.backgroundColor) {
+                td.backgroundColor = tableCell.style.backgroundColor
+              }
+              tr.tdList.push(td)
+            })
+            element.trList!.push(tr)
+          })
+          if (element.trList!.length) {
+            // 列选项数据
+            const tdCount = element.trList![0].tdList.reduce(
+              (pre, cur) => pre + cur.colspan,
+              0
+            )
+            const width = Math.ceil(options.innerWidth / tdCount)
+            for (let i = 0; i < tdCount; i++) {
+              const colElement = colElements[i]?.getAttribute('width')
+              element.colgroup!.push({
+                width: colElement ? parseFloat(colElement) : width
+              })
+            }
+            elementList.push(element)
+          }
+        } else if (
+          node.nodeName === 'INPUT' &&
+          (<HTMLInputElement>node).type === ControlComponent.CHECKBOX
+        ) {
+          elementList.push({
+            type: ElementType.CHECKBOX,
+            value: '',
+            checkbox: {
+              value: (<HTMLInputElement>node).checked
+            }
+          })
+        } else if (
+          node.nodeName === 'INPUT' &&
+          (<HTMLInputElement>node).type === ControlComponent.RADIO
+        ) {
+          elementList.push({
+            type: ElementType.RADIO,
+            value: '',
+            radio: {
+              value: (<HTMLInputElement>node).checked
+            }
+          })
+        } else {
+          findTextNode(node)
+          if (node.nodeType === 1 && n !== childNodes.length - 1) {
+            const display = window.getComputedStyle(node as Element).display
+            if (display === 'block') {
+              elementList.push({
+                value: '\n'
+              })
+            }
+          }
+        }
+      }
+    }
+  }
+  // 追加dom
+  const clipboardDom = document.createElement('div')
+  clipboardDom.innerHTML = htmlText
+  document.body.appendChild(clipboardDom)
+  const deleteNodes: ChildNode[] = []
+  clipboardDom.childNodes.forEach(child => {
+    if (child.nodeType !== 1 && !child.textContent?.trim()) {
+      deleteNodes.push(child)
+    }
+  })
+  deleteNodes.forEach(node => node.remove())
+  // 搜索文本节点
+  findTextNode(clipboardDom)
+  // 移除dom
+  clipboardDom.remove()
+  return elementList
+}
+
+export function getElementListByHTMLCopy(
   htmlText: string,
   options: IGetElementListByHTMLOption
 ): IElement[] {

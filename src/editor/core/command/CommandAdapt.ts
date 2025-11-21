@@ -95,11 +95,13 @@ import {
 } from '../../utils'
 import {
   createDomFromElementList,
+  createDomFromElementListCopy,
   formatElementContext,
   formatElementList,
   isTextLikeElement,
   pickElementAttr,
   getElementListByHTML,
+  getElementListByHTMLCopy,
   getTextFromElementList,
   zipElementList,
   getAnchorElement
@@ -155,6 +157,24 @@ export class CommandAdapt {
     this.i18n = draw.getI18n()
     this.zone = draw.getZone()
     this.tableOperate = draw.getTableOperate()
+  }
+
+  public clearContent() {
+    const isDisabled = this.draw.isReadonly() || this.draw.isDisabled()
+    if (isDisabled) return
+    this.draw.setValue({
+      header: [],
+      main: [],
+      footer: []
+    }, {
+      isSetCursor: false
+    })
+    this.draw.clearSideEffect()
+    this.historyManager.recovery()
+    this.draw.render({
+      isSetCursor: false,
+      isSubmitHistory: false
+    })
   }
 
   public mode(payload: EditorMode) {
@@ -1453,6 +1473,18 @@ export class CommandAdapt {
     }
   }
 
+    public getHTMLCopy(): IEditorHTML {
+    const options = this.options
+    const headerElementList = this.draw.getHeaderElementList()
+    const mainElementList = this.draw.getOriginalMainElementList()
+    const footerElementList = this.draw.getFooterElementList()
+    return {
+      header: createDomFromElementListCopy(headerElementList, options).innerHTML,
+      main: createDomFromElementListCopy(mainElementList, options).innerHTML,
+      footer: createDomFromElementListCopy(footerElementList, options).innerHTML
+    }
+  }
+
   public getText(): IEditorText {
     const headerElementList = this.draw.getHeaderElementList()
     const mainElementList = this.draw.getOriginalMainElementList()
@@ -2268,6 +2300,23 @@ export class CommandAdapt {
     const getElementList = (htmlText?: string) =>
       htmlText !== undefined
         ? getElementListByHTML(htmlText, {
+            innerWidth
+          })
+        : undefined
+    this.setValue({
+      header: getElementList(header),
+      main: getElementList(main),
+      footer: getElementList(footer)
+    })
+  }
+
+  public setHTMLCopy(payload: Partial<IEditorHTML>) {
+    const { header, main, footer } = payload
+    const innerWidth = this.draw.getOriginalInnerWidth()
+    // 不设置值时数据为undefined，避免覆盖当前数据
+    const getElementList = (htmlText?: string) =>
+      htmlText !== undefined
+        ? getElementListByHTMLCopy(htmlText, {
             innerWidth
           })
         : undefined

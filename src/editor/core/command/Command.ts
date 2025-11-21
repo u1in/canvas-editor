@@ -97,6 +97,7 @@ export class Command {
   public executeLocationCatalog: CommandAdapt['locationCatalog']
   public executeWordTool: CommandAdapt['wordTool']
   public executeSetHTML: CommandAdapt['setHTML']
+  public executeSetHTMLCopy: CommandAdapt['setHTMLCopy']
   public executeSetGroup: CommandAdapt['setGroup']
   public executeDeleteGroup: CommandAdapt['deleteGroup']
   public executeLocationGroup: CommandAdapt['locationGroup']
@@ -120,6 +121,7 @@ export class Command {
   public getValueAsync: CommandAdapt['getValueAsync']
   public getAreaValue: CommandAdapt['getAreaValue']
   public getHTML: CommandAdapt['getHTML']
+  public getHTMLCopy: CommandAdapt['getHTMLCopy']
   public getText: CommandAdapt['getText']
   public getWordCount: CommandAdapt['getWordCount']
   public getCursorPosition: CommandAdapt['getCursorPosition']
@@ -250,6 +252,7 @@ export class Command {
     this.executeLocationCatalog = adapt.locationCatalog.bind(adapt)
     this.executeWordTool = adapt.wordTool.bind(adapt)
     this.executeSetHTML = adapt.setHTML.bind(adapt)
+    this.executeSetHTMLCopy = adapt.setHTMLCopy.bind(adapt)
     this.executeSetGroup = adapt.setGroup.bind(adapt)
     this.executeDeleteGroup = adapt.deleteGroup.bind(adapt)
     this.executeLocationGroup = adapt.locationGroup.bind(adapt)
@@ -263,6 +266,7 @@ export class Command {
     this.getValue = adapt.getValue.bind(adapt)
     this.getValueAsync = adapt.getValueAsync.bind(adapt)
     this.getHTML = adapt.getHTML.bind(adapt)
+    this.getHTMLCopy = adapt.getHTMLCopy.bind(adapt)
     this.getText = adapt.getText.bind(adapt)
     this.getWordCount = adapt.getWordCount.bind(adapt)
     this.getCursorPosition = adapt.getCursorPosition.bind(adapt)
