@@ -187,6 +187,24 @@ export class Cursor {
   public moveCursorToVisible(payload: IMoveCursorToVisibleOption) {
     const { cursorPosition, direction } = payload
     if (!cursorPosition || !direction) return
+
+    // 检查编辑器是否可见
+    const isContainerVisible = () => {
+      // 检查offsetParent是否存在（最简单的可见性检查）
+      if (this.container.offsetParent === null) {
+        return false
+      }
+
+      // 检查元素是否有尺寸（更精确的可见性检查）
+      const rect = this.container.getBoundingClientRect()
+      return rect.width > 0 && rect.height > 0
+    }
+
+    // 如果编辑器不可见，则不移动滚动条
+    if (!isContainerVisible()) {
+      return
+    }
+
     const {
       pageNo,
       coordinate: { leftTop, leftBottom }
