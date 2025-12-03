@@ -1086,6 +1086,44 @@ export function convertElementToDom(
   return dom
 }
 
+export function convertElementToDomCopy(
+  element: IElement,
+  options: DeepRequired<IEditorOption>
+): HTMLElement {
+  let tagName: keyof HTMLElementTagNameMap = 'span'
+  if (element.type === ElementType.SUPERSCRIPT) {
+    tagName = 'sup'
+  } else if (element.type === ElementType.SUBSCRIPT) {
+    tagName = 'sub'
+  }
+  const dom = document.createElement(tagName)
+  dom.style.fontFamily = element.font || options.defaultFont
+  if (element.rowFlex) {
+    dom.style.textAlign = convertRowFlexToTextAlign(element.rowFlex)
+  }
+  if (element.color) {
+    dom.style.color = element.color
+  }
+  if (element.bold) {
+    dom.style.fontWeight = '600'
+  }
+  if (element.italic) {
+    dom.style.fontStyle = 'italic'
+  }
+  dom.style.fontSize = `${element.size || options.defaultSize}px`
+  if (element.highlight) {
+    dom.style.backgroundColor = element.highlight
+  }
+  if (element.underline) {
+    dom.style.textDecoration = 'underline'
+  }
+  if (element.strikeout) {
+    dom.style.textDecoration += ' line-through'
+  }
+  dom.innerText = element.value.replace(new RegExp(`${ZERO}`, 'g'), '\n')
+  return dom
+}
+
 export function splitListElement(
   elementList: IElement[]
 ): Map<number, IElement[]> {
@@ -1497,7 +1535,16 @@ export function createDomFromElementListCopy(
       } else if (element.type === ElementType.IMAGE) {
         const img = document.createElement('img')
         if (element.value) {
-          img.src = element.value
+          img.src = (element.extension as { imageSrc?: string })?.imageSrc || element.value || '',
+          img.width = element.width!
+          img.height = element.height!
+        }
+        clipboardDom.append(img)
+      } else if (element.type === ElementType.LATEX) {
+        const img = document.createElement('img')
+        if (element.value) {
+          img.src = element.laTexSVG || '',
+          img.dataset.latex = element.value || ''
           img.width = element.width!
           img.height = element.height!
         }
@@ -1561,7 +1608,6 @@ export function createDomFromElementListCopy(
         clipboardDom.append(controlElement)
       } else if (
         !element.type ||
-        element.type === ElementType.LATEX ||
         TEXTLIKE_ELEMENT_TYPE.includes(element.type)
       ) {
         let text = ''
@@ -1571,13 +1617,17 @@ export function createDomFromElementListCopy(
           text = element.value
         }
         if (!text) continue
-        const dom = convertElementToDom(element, editorOptions)
+        const dom = convertElementToDomCopy(element, editorOptions)
         // 前一个元素是标题，移除首行换行符
         if (payload[e - 1]?.type === ElementType.TITLE) {
           text = text.replace(/^\n/, '')
         }
         dom.innerText = text.replace(new RegExp(`${ZERO}`, 'g'), '\n')
-        clipboardDom.append(dom)
+        if(element.type === ElementType.SUPERSCRIPT || element.type === ElementType.SUBSCRIPT ||element.underline || element.strikeout|| element.bold || element.italic) {
+          clipboardDom.append(dom)
+        } else {
+          clipboardDom.append(dom.innerText)
+        }
       }
     }
     return clipboardDom
