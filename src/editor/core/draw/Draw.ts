@@ -2882,7 +2882,7 @@ export class Draw {
     ) {
       const elementList = this.getElementList()
       const element = elementList[curIndex]
-      if (IMAGE_ELEMENT_TYPE.includes(element.type!)) {
+      if (element?.type && IMAGE_ELEMENT_TYPE.includes(element.type)) {
         isShowCursor = false
         const position = this.position.getCursorPosition()
         this.previewer.updateResizer(element, position)
