@@ -1543,8 +1543,14 @@ export function createDomFromElementListCopy(
       } else if (element.type === ElementType.LATEX) {
         const img = document.createElement('img')
         if (element.value) {
+          let encodeLatex = ''
+          try {
+            encodeLatex = encodeURIComponent(element.value || '')
+          } catch (error) {
+            encodeLatex = element.value || ''
+          }
           img.src = element.laTexSVG || '',
-          img.dataset.latex = element.value || ''
+          img.dataset.latex = encodeLatex
           img.width = element.width!
           img.height = element.height!
         }
