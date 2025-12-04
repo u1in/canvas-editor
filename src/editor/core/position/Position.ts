@@ -157,12 +157,22 @@ export class Position {
             ? curRow.ascent - metrics.height
             : curRow.ascent
         // MODIFY 新增一项配置，允许垂直布局
-        offsetY =
+        // 这里是真正执行绘制的逻辑
+        if (
           !element.hide &&
           element.type === ElementType.LATEX &&
           element.allowVerticalLayout
-            ? (curRow.height - element.height!) / 2
-            : offsetY
+        ) {
+          // 基线文字测量信息
+          const standardMetrics = this.draw.getTextParticle().measureBasisWord(
+            this.draw.getCtx(),
+            this.draw.getElementFont(element)
+          )
+          // 如果公式大于文本高度，offset不要拉起太高，不然就不是垂直居中的样子了
+          if(standardMetrics.fontBoundingBoxAscent < element.height!) {
+            offsetY = curRow.ascent - element.height! / 2 - standardMetrics.fontBoundingBoxAscent / 2
+          }
+        }
         // MODIFY 添加新api 位置偏移量
         offsetY += element.posOffset?.y || 0
         // MODIFY 添加新api，位置偏移量

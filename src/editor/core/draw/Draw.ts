@@ -1981,7 +1981,9 @@ export class Draw {
         ) {
           curRow.height = defaultBasicRowMarginHeight
           curRow.ascent = defaultBasicRowMarginHeight
-        } else if (curRow.height < height) {
+        } else if (curRow.ascent < ascent) {
+          curRow.height = height
+          curRow.ascent = ascent
           // MODIFY 新增一项配置，允许垂直布局
           if (
             !element.hide &&
@@ -1993,17 +1995,13 @@ export class Draw {
               ctx,
               this.getElementFont(element)
             )
-            curRow.height = height
-            curRow.ascent =
-              ascent -
-              metrics.height / 2 +
-              standardMetrics.fontBoundingBoxAscent / 2
-          } else {
-            // TODO 如果混排的话，这里会重设基线
-            // TODO 这里计算行高度，图片高度将会影响行高度
-            curRow.height = height
-            // TODO 这里计算行基线，图片高度将会影响基线
-            curRow.ascent = ascent
+            // 如果公式大于文本高度，基线设置为垂直居中的方便文字排版
+            if(standardMetrics.fontBoundingBoxAscent < element.height!) {
+              curRow.ascent =
+                curRow.ascent -
+                metrics.height / 2 +
+                standardMetrics.fontBoundingBoxAscent / 2
+            }
           }
         }
         curRow.elementList.push(rowElement)
