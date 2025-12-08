@@ -81,6 +81,8 @@ export const EDITOR_ELEMENT_ZIP_ATTR: Array<keyof IElement> = [
   // MODIFY 添加新api 左缩进
   'leftIndent',
   'imgToolDisabled',
+  'imgPreviewToolDisabled',
+  'imgResizeToolDisabled',
   'textDecoration',
   'extension',
   'externalId',

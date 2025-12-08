@@ -521,6 +521,7 @@ export class Previewer {
     const mode = this.draw.getMode()
     if (
       !this.curElement ||
+      (this.curElement.imgPreviewToolDisabled && !this.draw.isDesignMode()) ||
       (this.curElement.imgToolDisabled && !this.draw.isDesignMode()) ||
       (mode === EditorMode.PRINT &&
         this.options.modeRule[EditorMode.PRINT]?.imagePreviewerDisabled) ||
@@ -545,6 +546,7 @@ export class Previewer {
     // 图片工具配置禁用又非设计模式时不渲染
     const mode = this.draw.getMode()
     if (
+      (element.imgResizeToolDisabled && !this.draw.isDesignMode()) ||
       (element.imgToolDisabled && !this.draw.isDesignMode()) ||
       (mode === EditorMode.PRINT &&
         this.options.modeRule[EditorMode.PRINT]?.imagePreviewerDisabled) ||

@@ -126,6 +126,8 @@ export interface IDateElement {
 
 export interface IImageRule {
   imgToolDisabled?: boolean
+  imgPreviewToolDisabled?: boolean
+  imgResizeToolDisabled?: boolean
 }
 
 export interface IImageBasic {
