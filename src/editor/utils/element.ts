@@ -1491,7 +1491,7 @@ export function createDomFromElementListCopy(
             if (td.borderTypes?.includes(TdBorder.LEFT)) {
               tdDom.style.borderLeft = borderStyle
             }
-            const childDom = createDomFromElementList(td.value!, options)
+            const childDom = createDomFromElementListCopy(td.value!, options)
             tdDom.innerHTML = childDom.innerHTML
             if (td.backgroundColor) {
               tdDom.style.backgroundColor = td.backgroundColor
