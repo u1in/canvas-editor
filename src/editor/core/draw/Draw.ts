@@ -2871,6 +2871,11 @@ export class Draw {
         curIndex !== undefined ? positionList[curIndex] : null
       )
     }
+    // 设置当前页为光标所在页
+    const cursorPosition = this.position.getCursorPosition()
+    if (cursorPosition) {
+      this.setPageNo(cursorPosition.pageNo)
+    }
     // 定位到图片元素并且位置发生变化
     let isShowCursor = true
     if (
