@@ -397,16 +397,16 @@ export class RangeManager {
     const endElement = elementList[endIndex]
     // 选区前后不是控件 || 选区前不是控件或是后缀&&选区后不是控件或是后缀 || 选区在控件内
     return (
-      (!startElement.controlId && !endElement.controlId) ||
-      ((!startElement.controlId ||
-        startElement.controlComponent === ControlComponent.POSTFIX) &&
-        (!endElement.controlId ||
-          endElement.controlComponent === ControlComponent.POSTFIX)) ||
-      (!!startElement.controlId &&
-        endElement.controlId === startElement.controlId &&
-        endElement.controlComponent !== ControlComponent.PRE_TEXT &&
-        endElement.controlComponent !== ControlComponent.POST_TEXT &&
-        endElement.controlComponent !== ControlComponent.POSTFIX)
+      (!startElement?.controlId && !endElement?.controlId) ||
+      ((!startElement?.controlId ||
+        startElement?.controlComponent === ControlComponent.POSTFIX) &&
+        (!endElement?.controlId ||
+          endElement?.controlComponent === ControlComponent.POSTFIX)) ||
+      (!!startElement?.controlId &&
+        endElement?.controlId === startElement?.controlId &&
+        endElement?.controlComponent !== ControlComponent.PRE_TEXT &&
+        endElement?.controlComponent !== ControlComponent.POST_TEXT &&
+        endElement?.controlComponent !== ControlComponent.POSTFIX)
     )
   }
 
