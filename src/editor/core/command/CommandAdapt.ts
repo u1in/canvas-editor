@@ -159,21 +159,24 @@ export class CommandAdapt {
     this.tableOperate = draw.getTableOperate()
   }
 
-  public clearContent() {
+  public clearContent(): void {
     const isDisabled = this.draw.isReadonly() || this.draw.isDisabled()
     if (isDisabled) return
-    this.draw.setValue({
-      header: [],
-      main: [],
-      footer: []
-    }, {
-      isSetCursor: false
-    })
+    this.draw.setValue(
+      {
+        header: [],
+        main: [],
+        footer: []
+      },
+      {
+        isSetCursor: true
+      }
+    )
     this.draw.clearSideEffect()
     this.historyManager.recovery()
     this.draw.render({
-      isSetCursor: false,
-      isSubmitHistory: false
+      isSetCursor: true,
+      isSubmitHistory: true
     })
   }
 
@@ -1473,13 +1476,14 @@ export class CommandAdapt {
     }
   }
 
-    public getHTMLCopy(): IEditorHTML {
+  public getHTMLCopy(): IEditorHTML {
     const options = this.options
     const headerElementList = this.draw.getHeaderElementList()
     const mainElementList = this.draw.getOriginalMainElementList()
     const footerElementList = this.draw.getFooterElementList()
     return {
-      header: createDomFromElementListCopy(headerElementList, options).innerHTML,
+      header: createDomFromElementListCopy(headerElementList, options)
+        .innerHTML,
       main: createDomFromElementListCopy(mainElementList, options).innerHTML,
       footer: createDomFromElementListCopy(footerElementList, options).innerHTML
     }
