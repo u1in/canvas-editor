@@ -1629,11 +1629,7 @@ export function createDomFromElementListCopy(
           text = text.replace(/^\n/, '')
         }
         dom.innerText = text.replace(new RegExp(`${ZERO}`, 'g'), '\n')
-        if(element.type === ElementType.SUPERSCRIPT || element.type === ElementType.SUBSCRIPT ||element.underline || element.strikeout|| element.bold || element.italic) {
-          clipboardDom.append(dom)
-        } else {
-          clipboardDom.append(dom.innerText)
-        }
+        clipboardDom.append(dom)
       }
     }
     return clipboardDom
