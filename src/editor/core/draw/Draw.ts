@@ -1996,7 +1996,7 @@ export class Draw {
               this.getElementFont(element)
             )
             // 如果公式大于文本高度，基线设置为垂直居中的方便文字排版
-            if(standardMetrics.fontBoundingBoxAscent < element.height!) {
+            if (standardMetrics.fontBoundingBoxAscent < element.height!) {
               curRow.ascent =
                 curRow.ascent -
                 metrics.height / 2 +
