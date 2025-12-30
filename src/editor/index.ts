@@ -61,7 +61,7 @@ import { Override } from './core/override/Override'
 import { LETTER_CLASS } from './dataset/constant/Common'
 import { INTERNAL_CONTEXT_MENU_KEY } from './dataset/constant/ContextMenu'
 import { IRange } from './interface/Range'
-import { debounce, deepClone, splitText } from './utils'
+import { debounce, deepClone, nextTick, splitText } from './utils'
 import {
   createDomFromElementList,
   getElementListByHTML,
@@ -170,7 +170,8 @@ export {
   getElementListByHTML,
   getTextFromElementList,
   deepClone,
-  debounce
+  debounce,
+  nextTick
 }
 
 // 对外常量
