@@ -1913,6 +1913,19 @@ export class Draw {
           rowFlex: elementList[i]?.rowFlex || elementList[i + 1]?.rowFlex,
           isPageBreak: element.type === ElementType.PAGE_BREAK
         }
+        // 有些字符的上升高度可能是负数，比如下划线
+        // 所以行高大于等于上身高度时，赋予一个基础的上升高度避免行塌陷
+        // 比如整行都是空格，行上升高度为rowMargin
+        // 比如整行都是下划线，行上升高度小于rowMargin
+        if (row.ascent <= rowMargin) {
+          const boundingBoxAscent =
+            this.textParticle.getBasisWordBoundingBoxAscent(
+              ctx,
+              element.font!
+            ) * scale
+          row.ascent = rowMargin + boundingBoxAscent
+          row.height = rowMargin + boundingBoxAscent
+        }
         // 控件缩进
         if (
           rowElement.controlComponent !== ControlComponent.PREFIX &&
