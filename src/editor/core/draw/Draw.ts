@@ -1969,11 +1969,11 @@ export class Draw {
         // 如果没有取上一行的左缩进
         if (isWrap && isForceBreak) {
           const preRow = rowList[rowList.length - 1]
-          row.offsetX = element.leftIndent?.width || preRow?.offsetX || 0
+          row.offsetX = element.leftIndent?.width !== undefined ? element.leftIndent.width : preRow?.offsetX || 0
         }
         if (isWrap && element.type === ElementType.TABLE) {
           const preRow = rowList[rowList.length - 1]
-          if (!element.leftIndent?.width) {
+          if (element.leftIndent?.width === undefined) {
             element.leftIndent = {
               width: preRow.offsetX || 0
             }
@@ -2324,7 +2324,7 @@ export class Draw {
           this.textParticle.complete()
           this.blockParticle.render(pageNo, element, x, y + offsetY)
         } else {
-          if (element.leftIndent?.width) {
+          if (element.leftIndent?.width !== undefined) {
             this.leftIndentParticle.drawLeftIndentText(
               ctx,
               element,
