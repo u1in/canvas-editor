@@ -164,13 +164,18 @@ export class Position {
           element.allowVerticalLayout
         ) {
           // 基线文字测量信息
-          const standardMetrics = this.draw.getTextParticle().measureBasisWord(
-            this.draw.getCtx(),
-            this.draw.getElementFont(element)
-          )
+          const standardMetrics = this.draw
+            .getTextParticle()
+            .measureBasisWord(
+              this.draw.getCtx(),
+              this.draw.getElementFont(element)
+            )
           // 如果公式大于文本高度，offset不要拉起太高，不然就不是垂直居中的样子了
-          if(standardMetrics.fontBoundingBoxAscent < element.height!) {
-            offsetY = curRow.ascent - element.height! / 2 - standardMetrics.fontBoundingBoxAscent / 2
+          if (standardMetrics.fontBoundingBoxAscent < element.height!) {
+            offsetY =
+              curRow.ascent -
+              element.height! / 2 -
+              standardMetrics.fontBoundingBoxAscent / 2
           }
         }
         // MODIFY 添加新api 位置偏移量
