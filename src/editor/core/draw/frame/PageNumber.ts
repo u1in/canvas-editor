@@ -28,6 +28,10 @@ export class PageNumber {
     return text.replace(replaceReg, pageNoText)
   }
 
+  formatPageNo(text: string) {
+    return text
+  }
+
   public render(ctx: CanvasRenderingContext2D, pageNo: number) {
     const {
       scale,
@@ -62,6 +66,9 @@ export class PageNumber {
         pageCountReg,
         numberType
       )
+    }
+    if (this.formatPageNo) {
+      text = this.formatPageNo(text)
     }
     const width = this.draw.getWidth()
     // 计算y位置
