@@ -2,7 +2,7 @@
   "name": "@u1in/canvas-editor",
   "author": "u1in",
   "license": "MIT",
-  "version": "0.9.115-custom.4.0",
+  "version": "0.9.115-custom.5.0",
   "description": "rich text editor by canvas/svg",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/",
