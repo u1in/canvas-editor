@@ -2983,4 +2983,7 @@ export class Draw {
   public getDrawRowList() {
     return this.rowList
   }
+  public getPageNumber() {
+    return this.pageNumber
+  }
 }
