@@ -83,6 +83,12 @@ export function printImageBase64(
   style.append(document.createTextNode(stylesheet))
   setTimeout(() => {
     doc.write(`${style.outerHTML}${container.innerHTML}`)
+    // 添加 afterprint 事件监听用于销毁 iframe
+    contentWindow.addEventListener('afterprint', () => {
+      iframe?.remove()
+    }, {
+      once: true
+    })
     contentWindow.print()
     doc.close()
     // 移除iframe
