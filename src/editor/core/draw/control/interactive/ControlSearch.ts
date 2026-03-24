@@ -51,7 +51,7 @@ export class ControlSearch {
     let isDisabledControlHighlight = false
     let isExitsValueControlHighlight = false
     let isNoValueControlHighlight = false
-    if (!element.highlight) {
+    if (!element?.highlight) {
       // 控件激活时高亮色
       isActiveControlHighlight =
         !isPrintMode &&

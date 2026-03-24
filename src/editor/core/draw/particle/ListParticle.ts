@@ -104,7 +104,7 @@ export class ListParticle {
   ): Map<string, number> {
     const listStyleMap = new Map<string, number>()
     let start = 0
-    let curListId = elementList[start].listId
+    let curListId = elementList[start]?.listId
     let curElementList: IElement[] = []
     const elementLength = elementList.length
     while (start < elementLength) {

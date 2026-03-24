@@ -557,7 +557,7 @@ export function formatElementList(
       el.id = el.id || getUUID()
     }
     if (el.type === ElementType.LATEX) {
-      if (!(el.laTexSVG && el.width && el.height)) {
+      if (!(el?.laTexSVG && el?.width && el?.height && el?.value)) {
         const { svg, width, height } = LaTexParticle.convertLaTextToSVG(
           el.value
         )
