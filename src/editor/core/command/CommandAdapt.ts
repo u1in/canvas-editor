@@ -1851,26 +1851,49 @@ export class CommandAdapt {
 
   public increaseLeftIndentWidth(width?: number) {
     const innerWidth = this.draw.getInnerWidth()
-    const cursorPosition = this.position.getCursorPosition()
     const positionList = this.position.getOriginalPositionList()
     const elementList = this.draw.getOriginalMainElementList()
-    if (cursorPosition?.index === undefined) return
-    const cursorPos = positionList[cursorPosition.index]
-    const cursorEle = elementList[cursorPos.index]
     const rowList = this.draw.getRowList()
     const defaultTabWidth = this.draw.getOptions().defaultTabWidth
-    if (cursorPos?.rowIndex !== undefined) {
-      const currentRow = rowList[cursorPos.rowIndex]
-      const preRow =
-        cursorPos.rowIndex - 1 >= 0 ? rowList[cursorPos.rowIndex - 1] : null
+
+    // 获取选区信息
+    const { startIndex, endIndex } = this.range.getRange()
+    if (!~startIndex && !~endIndex) return
+
+    // 判断是否有选区
+    const hasSelection = startIndex !== endIndex
+
+    // 获取需要处理的行索引集合
+    const rowIndexSet = new Set<number>()
+    if (hasSelection) {
+      // 有选区：收集选区涉及的所有行
+      for (let i = startIndex; i <= endIndex; i++) {
+        const pos = positionList[i]
+        if (pos?.rowIndex !== undefined) {
+          rowIndexSet.add(pos.rowIndex)
+        }
+      }
+    } else {
+      // 无选区：只处理光标所在行
+      const cursorPos = positionList[startIndex]
+      if (cursorPos?.rowIndex !== undefined) {
+        rowIndexSet.add(cursorPos.rowIndex)
+      }
+    }
+
+    // 对每一行进行缩进处理
+    rowIndexSet.forEach(rowIndex => {
+      const currentRow = rowList[rowIndex]
+      if (!currentRow) return
+
+      const preRow = rowIndex - 1 >= 0 ? rowList[rowIndex - 1] : null
       let firstElement = currentRow.elementList[0]
+
       // 换行下来的行，先找到行首
       if (preRow && preRow.isWidthNotEnough) {
-        // 找到宽度不足的行行首
-        let i = cursorPos.rowIndex - 1
+        let i = rowIndex - 1
         while (i >= 1) {
           firstElement = rowList[i].elementList[0]
-          // 向前找到第一个没有跨行的行，下一行就是光标所在行行首
           if (!rowList[i].isWidthNotEnough) {
             i = i + 1
             firstElement = rowList[i].elementList[0]
@@ -1879,6 +1902,7 @@ export class CommandAdapt {
           i--
         }
       }
+
       // 找到行首元素，赋予偏移量
       if (!firstElement.leftIndent?.width) {
         firstElement.leftIndent = {
@@ -1890,13 +1914,18 @@ export class CommandAdapt {
         firstElement.type = ElementType.LEFT_INDENT
       }
       firstElement.leftIndent.width! += width || defaultTabWidth
+
+      // 限制缩进宽度
+      const cursorEle = elementList[currentRow.startIndex]
       if (
-        cursorEle.type !== ElementType.TABLE &&
+        cursorEle?.type !== ElementType.TABLE &&
         firstElement.leftIndent.width! + currentRow.width > innerWidth
       ) {
         firstElement.leftIndent.width! = innerWidth - currentRow.width
       }
-      if (cursorEle.type === ElementType.TABLE) {
+
+      // 处理表格
+      if (cursorEle?.type === ElementType.TABLE) {
         firstElement.width = innerWidth - firstElement.leftIndent.width!
         if (!firstElement.colgroup?.length) {
           firstElement.colgroup = []
@@ -1907,35 +1936,61 @@ export class CommandAdapt {
             firstElement.colgroup!.length
         })
       }
-    }
+    })
+
+    // 光标定位
+    const curIndex = hasSelection ? startIndex : startIndex
     this.draw.render({
-      curIndex: cursorPos?.index,
+      curIndex,
       isSubmitHistory: true
     })
   }
 
   public decreaseLeftIndentWidth(width?: number) {
     const innerWidth = this.draw.getInnerWidth()
-    const cursorPosition = this.position.getCursorPosition()
     const positionList = this.position.getOriginalPositionList()
     const elementList = this.draw.getOriginalMainElementList()
-    if (cursorPosition?.index === undefined) return
-    const cursorPos = positionList[cursorPosition.index]
-    const cursorEle = elementList[cursorPos.index]
     const rowList = this.draw.getRowList()
     const defaultTabWidth = this.draw.getOptions().defaultTabWidth
-    if (cursorPos?.rowIndex !== undefined) {
-      const currentRow = rowList[cursorPos.rowIndex]
-      const preRow =
-        cursorPos.rowIndex - 1 >= 0 ? rowList[cursorPos.rowIndex - 1] : null
+
+    // 获取选区信息
+    const { startIndex, endIndex } = this.range.getRange()
+    if (!~startIndex && !~endIndex) return
+
+    // 判断是否有选区
+    const hasSelection = startIndex !== endIndex
+
+    // 获取需要处理的行索引集合
+    const rowIndexSet = new Set<number>()
+    if (hasSelection) {
+      // 有选区：收集选区涉及的所有行
+      for (let i = startIndex; i <= endIndex; i++) {
+        const pos = positionList[i]
+        if (pos?.rowIndex !== undefined) {
+          rowIndexSet.add(pos.rowIndex)
+        }
+      }
+    } else {
+      // 无选区：只处理光标所在行
+      const cursorPos = positionList[startIndex]
+      if (cursorPos?.rowIndex !== undefined) {
+        rowIndexSet.add(cursorPos.rowIndex)
+      }
+    }
+
+    // 对每一行进行缩进处理
+    rowIndexSet.forEach(rowIndex => {
+      const currentRow = rowList[rowIndex]
+      if (!currentRow) return
+
+      const preRow = rowIndex - 1 >= 0 ? rowList[rowIndex - 1] : null
       let firstElement = currentRow.elementList[0]
+
       // 换行下来的行，先找到行首
       if (preRow && preRow.isWidthNotEnough) {
-        // 找到宽度不足的行行首
-        let i = cursorPos.rowIndex - 1
+        let i = rowIndex - 1
         while (i >= 1) {
           firstElement = rowList[i].elementList[0]
-          // 向前找到第一个没有跨行的行，下一行就是光标所在行行首
           if (!rowList[i].isWidthNotEnough) {
             i = i + 1
             firstElement = rowList[i].elementList[0]
@@ -1944,6 +1999,7 @@ export class CommandAdapt {
           i--
         }
       }
+
       // 找到行首元素，赋予偏移量
       if (!firstElement.leftIndent?.width) {
         firstElement.leftIndent = {
@@ -1958,7 +2014,10 @@ export class CommandAdapt {
       if (firstElement.leftIndent.width! < 0) {
         firstElement.leftIndent.width! = 0
       }
-      if (cursorEle.type === ElementType.TABLE) {
+
+      // 处理表格
+      const cursorEle = elementList[currentRow.startIndex]
+      if (cursorEle?.type === ElementType.TABLE) {
         firstElement.width = innerWidth - firstElement.leftIndent.width!
         if (!firstElement.colgroup?.length) {
           firstElement.colgroup = []
@@ -1969,9 +2028,12 @@ export class CommandAdapt {
             firstElement.colgroup!.length
         })
       }
-    }
+    })
+
+    // 光标定位
+    const curIndex = hasSelection ? startIndex : startIndex
     this.draw.render({
-      curIndex: cursorPos?.index,
+      curIndex,
       isSubmitHistory: true
     })
   }
