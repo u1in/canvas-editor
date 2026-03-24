@@ -91,7 +91,8 @@ import {
   downloadFile,
   getUUID,
   isNumber,
-  isObjectEqual
+  isObjectEqual,
+  nextTick
 } from '../../utils'
 import {
   createDomFromElementList,
@@ -129,6 +130,8 @@ import {
 } from '../../interface/Area'
 import { IAreaBadge, IBadge } from '../../interface/Badge'
 import { IRichtextOption } from '../../interface/Command'
+import { EventBus } from '../event/eventbus/EventBus'
+import { EventBusMap } from '../../interface/EventBus'
 
 export class CommandAdapt {
   private draw: Draw
@@ -143,6 +146,7 @@ export class CommandAdapt {
   private i18n: I18n
   private zone: Zone
   private tableOperate: TableOperate
+  private eventBus: EventBus<EventBusMap>
 
   constructor(draw: Draw) {
     this.draw = draw
@@ -157,26 +161,37 @@ export class CommandAdapt {
     this.i18n = draw.getI18n()
     this.zone = draw.getZone()
     this.tableOperate = draw.getTableOperate()
+    this.eventBus = draw.getEventBus()
   }
 
-  public clearContent(): void {
-    const isDisabled = this.draw.isReadonly() || this.draw.isDisabled()
-    if (isDisabled) return
-    this.draw.setValue(
-      {
+  public clearContent(): Promise<void> {
+    return new Promise(resolve => {
+      const isDisabled = this.draw.isReadonly() || this.draw.isDisabled()
+      if (isDisabled) return
+      this.position.setPositionContext({
+        isTable: false,
+        isControl: false
+      })
+      this.draw.setEditorData({
         header: [],
         main: [],
         footer: []
-      },
-      {
-        isSetCursor: true
+      })
+      // 渲染&计算&清空历史记录
+      this.historyManager.recovery()
+      const callback = () => {
+        // 取消订阅
+        this.eventBus.off('contentChange', callback)
+        // 解析 Promise
+        resolve()
       }
-    )
-    this.draw.clearSideEffect()
-    this.historyManager.recovery()
-    this.draw.render({
-      isSetCursor: true,
-      isSubmitHistory: true
+      // 订阅 contentChange 事件
+      this.eventBus.on('contentChange', callback)
+      this.draw.render({
+        curIndex: 0,
+        isSetCursor: true,
+        isFirstRender: true
+      })
     })
   }
 
@@ -303,6 +318,36 @@ export class CommandAdapt {
     this.draw.render({
       isSubmitHistory,
       isSetCursor: false
+    })
+  }
+
+  public async forceUpdateWithCallback(
+    options?: IForceUpdateOption
+  ): Promise<void> {
+    return new Promise(resolve => {
+      let resolved = false
+
+      const doResolve = () => {
+        if (!resolved) {
+          resolved = true
+          this.eventBus.off('contentChange', doResolve)
+          resolve()
+        }
+      }
+
+      // 订阅 contentChange 事件（如果触发了的话）
+      this.eventBus.on('contentChange', doResolve)
+
+      // 执行更新
+      this.forceUpdate(options)
+
+      // 双重保障：nextTick + 超时
+      nextTick(() => {
+        nextTick(doResolve)
+      })
+
+      // 超时保护，最多等待 100ms
+      setTimeout(doResolve, 100)
     })
   }
 
@@ -2100,6 +2145,37 @@ export class CommandAdapt {
 
   public setValue(payload: Partial<IEditorData>, options?: ISetValueOption) {
     this.draw.setValue(payload, options)
+  }
+
+  public async setValueWithCallback(
+    payload: Partial<IEditorData>,
+    options?: ISetValueOption
+  ): Promise<void> {
+    return new Promise(resolve => {
+      let resolved = false
+
+      const doResolve = () => {
+        if (!resolved) {
+          resolved = true
+          this.eventBus.off('contentChange', doResolve)
+          resolve()
+        }
+      }
+
+      // 订阅 contentChange 事件
+      this.eventBus.on('contentChange', doResolve)
+
+      // 执行更新
+      this.setValue(payload, options)
+
+      // 双重保障：nextTick + 超时
+      nextTick(() => {
+        nextTick(doResolve)
+      })
+
+      // 超时保护，最多等待 100ms
+      setTimeout(doResolve, 100)
+    })
   }
 
   public removeControl(payload?: IRemoveControlOption) {

@@ -12,6 +12,7 @@ export class Command {
   public executeReplaceRange: CommandAdapt['replaceRange']
   public executeSetPositionContext: CommandAdapt['setPositionContext']
   public executeForceUpdate: CommandAdapt['forceUpdate']
+  public executeForceUpdateWithCallback: CommandAdapt['forceUpdateWithCallback']
   public executeBlur: CommandAdapt['blur']
   public executeUndo: CommandAdapt['undo']
   public executeRedo: CommandAdapt['redo']
@@ -91,6 +92,7 @@ export class Command {
   public executeUpdateElementById: CommandAdapt['updateElementById']
   public executeDeleteElementById: CommandAdapt['deleteElementById']
   public executeSetValue: CommandAdapt['setValue']
+  public executeSetValueWithCallback: CommandAdapt['setValueWithCallback']
   public executeRemoveControl: CommandAdapt['removeControl']
   public executeTranslate: CommandAdapt['translate']
   public executeSetLocale: CommandAdapt['setLocale']
@@ -157,6 +159,7 @@ export class Command {
     this.executeReplaceRange = adapt.replaceRange.bind(adapt)
     this.executeSetPositionContext = adapt.setPositionContext.bind(adapt)
     this.executeForceUpdate = adapt.forceUpdate.bind(adapt)
+    this.executeForceUpdateWithCallback = adapt.forceUpdateWithCallback.bind(adapt)
     this.executeBlur = adapt.blur.bind(adapt)
     // 撤销、重做、格式刷、清除格式
     this.executeUndo = adapt.undo.bind(adapt)
@@ -248,6 +251,7 @@ export class Command {
     this.executeUpdateElementById = adapt.updateElementById.bind(adapt)
     this.executeDeleteElementById = adapt.deleteElementById.bind(adapt)
     this.executeSetValue = adapt.setValue.bind(adapt)
+    this.executeSetValueWithCallback = adapt.setValueWithCallback.bind(adapt)
     this.executeRemoveControl = adapt.removeControl.bind(adapt)
     this.executeTranslate = adapt.translate.bind(adapt)
     this.executeSetLocale = adapt.setLocale.bind(adapt)
