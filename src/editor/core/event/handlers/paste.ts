@@ -126,6 +126,8 @@ export function pasteByEvent(host: CanvasEvent, evt: ClipboardEvent) {
     // 默认阻止默认事件
     if ((<IOverrideResult>overrideResult)?.preventDefault !== false) return
   }
+  // 获取配置
+  const options = draw.getOptions()
   // 优先读取编辑器内部粘贴板数据（粘贴板不包含文件时）
   if (!getIsClipboardContainFile(clipboardData)) {
     const clipboardText = clipboardData.getData('text')
@@ -136,18 +138,26 @@ export function pasteByEvent(host: CanvasEvent, evt: ClipboardEvent) {
       normalizeLineBreak(clipboardText) ===
         normalizeLineBreak(editorClipboardData.text)
     ) {
-      pasteElement(host, editorClipboardData.elementList)
+      // 如果配置为纯文本粘贴，则只粘贴文本内容
+      if (options.pasteAsPlainText) {
+        host.input(editorClipboardData.text)
+      } else {
+        pasteElement(host, editorClipboardData.elementList)
+      }
       return
     }
   }
   removeClipboardData()
   // 从粘贴板提取数据
+  // 如果配置为纯文本粘贴，则跳过 HTML 检测
   let isHTML = false
-  for (let i = 0; i < clipboardData.items.length; i++) {
-    const item = clipboardData.items[i]
-    if (item.type === 'text/html') {
-      isHTML = true
-      break
+  if (!options.pasteAsPlainText) {
+    for (let i = 0; i < clipboardData.items.length; i++) {
+      const item = clipboardData.items[i]
+      if (item.type === 'text/html') {
+        isHTML = true
+        break
+      }
     }
   }
   for (let i = 0; i < clipboardData.items.length; i++) {
@@ -186,6 +196,9 @@ export async function pasteByApi(host: CanvasEvent, options?: IPasteOption) {
     // 默认阻止默认事件
     if ((<IOverrideResult>overrideResult)?.preventDefault !== false) return
   }
+  // 获取全局配置，API 参数优先级更高
+  const editorOptions = draw.getOptions()
+  const isPlainText = options?.isPlainText ?? editorOptions.pasteAsPlainText
   // 优先读取编辑器内部粘贴板数据
   const clipboardText = await navigator.clipboard.readText()
   const editorClipboardData = getClipboardData()
@@ -194,12 +207,17 @@ export async function pasteByApi(host: CanvasEvent, options?: IPasteOption) {
     normalizeLineBreak(clipboardText) ===
       normalizeLineBreak(editorClipboardData.text)
   ) {
-    pasteElement(host, editorClipboardData.elementList)
+    // 根据配置决定粘贴方式
+    if (isPlainText) {
+      host.input(editorClipboardData.text)
+    } else {
+      pasteElement(host, editorClipboardData.elementList)
+    }
     return
   }
   removeClipboardData()
   // 从内存粘贴板获取数据
-  if (options?.isPlainText) {
+  if (isPlainText) {
     if (clipboardText) {
       host.input(clipboardText)
     }
