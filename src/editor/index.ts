@@ -64,6 +64,7 @@ import { IRange } from './interface/Range'
 import { debounce, deepClone, nextTick, splitText } from './utils'
 import {
   createDomFromElementList,
+  createDomFromElementListCopy,
   getElementListByHTML,
   getTextFromElementList,
   type IGetElementListByHTMLOption
@@ -167,6 +168,7 @@ export default class Editor {
 export {
   splitText,
   createDomFromElementList,
+  createDomFromElementListCopy,
   getElementListByHTML,
   getTextFromElementList,
   deepClone,
