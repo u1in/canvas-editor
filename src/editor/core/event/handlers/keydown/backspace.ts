@@ -1,6 +1,39 @@
 import { ZERO } from '../../../../dataset/constant/Common'
 import { ElementType } from '../../../../dataset/enum/Element'
+import { IElement } from '../../../../interface/Element'
 import { CanvasEvent } from '../../CanvasEvent'
+
+// 处理缩进元素的 backspace 逻辑
+function handleLeftIndentBackspace(
+  draw: ReturnType<CanvasEvent['getDraw']>,
+  element: IElement,
+  startIndex: number
+): boolean {
+  const defaultTabWidth = draw.getOptions().defaultTabWidth || 40
+  const leftIndentWidth = element.leftIndent?.width || 0
+  
+  // 如果缩进宽度大于一倍 defaultTabWidth，则缩小
+  if (leftIndentWidth > defaultTabWidth) {
+    // 计算新宽度，保持为 defaultTabWidth 的整数倍
+    const newWidth = Math.max(defaultTabWidth, Math.floor(leftIndentWidth / defaultTabWidth - 1) * defaultTabWidth)
+    element.leftIndent!.width = newWidth
+    draw.getRange().setRange(startIndex, startIndex)
+    draw.render({
+      curIndex: startIndex
+    })
+    return true
+  }
+  
+  // 否则转为普通的 ZERO 元素
+  delete element.type
+  delete element.leftIndent
+  
+  draw.getRange().setRange(startIndex, startIndex)
+  draw.render({
+    curIndex: startIndex
+  })
+  return true
+}
 
 // 删除光标前隐藏元素
 function backspaceHideElement(host: CanvasEvent) {
@@ -136,7 +169,7 @@ export function backspace(evt: KeyboardEvent, host: CanvasEvent) {
     // 普通元素删除
     const cursorPosition = draw.getPosition().getCursorPosition()
     if (!cursorPosition) return
-    const { index } = cursorPosition
+    const { index, isFirstLetter } = cursorPosition
     const isCollapsed = rangeManager.getIsCollapsed()
     const elementList = draw.getElementList()
     // 判断是否允许删除
@@ -148,15 +181,18 @@ export function backspace(evt: KeyboardEvent, host: CanvasEvent) {
           draw.getListParticle().unsetList()
         }
         if (firstElement.type === ElementType.LEFT_INDENT) {
-          // 转为ZERO元素
-          delete firstElement.type
-          delete firstElement.leftIndent
-          
-          rangeManager.setRange(startIndex, startIndex)
-          draw.render({
-            curIndex: startIndex
-          })
+          // 缩小缩进宽度或转为ZERO元素
+          handleLeftIndentBackspace(draw, firstElement, startIndex)
         }
+        evt.preventDefault()
+        return
+      }
+    }
+    // 处理行首缩进元素的 backspace（非文档首行的情况）
+    if (isCollapsed && isFirstLetter && index > 0) {
+      const currentElement = elementList[index]
+      if (currentElement.value === ZERO && currentElement.type === ElementType.LEFT_INDENT) {
+        handleLeftIndentBackspace(draw, currentElement, index)
         evt.preventDefault()
         return
       }
