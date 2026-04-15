@@ -99,6 +99,10 @@ export class ImageParticle {
     this.draw.getImageObserver().add(promise)
   }
 
+  protected getRenderCount() {
+    return this.draw.getRenderCount()
+  }
+
   protected getFallbackImage(width: number, height: number): HTMLImageElement {
     const tileSize = 8
     const x = (width - Math.ceil(width / tileSize) * tileSize) / 2
