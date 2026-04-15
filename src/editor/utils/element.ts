@@ -141,7 +141,8 @@ export function formatElementList(
         ...el,
         value: ZERO,
         type: ElementType.LEFT_INDENT,
-        leftIndent: el.leftIndent
+        leftIndent: el.leftIndent,
+        id: el.id || getUUID()
       })
     } else if (el.type === ElementType.LIST) {
       // 移除父节点
@@ -554,6 +555,9 @@ export function formatElementList(
       el.value = ZERO
     }
     if (el.type === ElementType.IMAGE || el.type === ElementType.BLOCK) {
+      el.id = el.id || getUUID()
+    }
+    if (el.type === ElementType.LEFT_INDENT) {
       el.id = el.id || getUUID()
     }
     if (el.type === ElementType.LATEX) {
@@ -1549,7 +1553,7 @@ export function createDomFromElementListCopy(
           } catch (error) {
             encodeLatex = element.value || ''
           }
-          img.src = element.laTexSVG || '',
+          img.src = (element.extension as { latexSrc?: string })?.latexSrc || element.laTexSVG || '',
           img.dataset.latex = encodeLatex
           img.width = element.width!
           img.height = element.height!
