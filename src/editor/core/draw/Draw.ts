@@ -2729,12 +2729,12 @@ export class Draw {
 
   public render(payload?: IDrawOption) {
     this.renderCount++
-    const { header, footer } = this.options
+    const { header, footer, lazyRender } = this.options
     const {
       isSubmitHistory = true,
       isSetCursor = true,
       isCompute = true,
-      isLazy = true,
+      isLazy = lazyRender,
       isInit = false,
       isSourceHistory = false,
       isFirstRender = false
