@@ -102,6 +102,10 @@ export interface IEditorOption {
   pageBorder?: IPageBorderOption
   badge?: IBadgeOption
   modeRule?: IModeRule
+  pasteAsPlainText?: boolean
+  lazyRender?: boolean
+  /** 是否启用缩进元素样式（颜色、粗细等），默认为 true */
+  enableIndentStyle?: boolean
 }
 
 export interface IEditorResult {
