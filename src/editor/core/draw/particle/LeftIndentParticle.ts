@@ -18,19 +18,33 @@ export class LeftIndentParticle {
     x: number,
     y: number
   ): void {
-    const finalFontSize = this.options.defaultSize
-    const finalFontFamily = this.options.defaultFont
-    const font =
-      element?.leftIndent?.fontStyle ||
-      `${finalFontSize * this.options.scale}px ${finalFontFamily}`
-    const text = element.leftIndent?.text || ''
-
+    const leftIndent = element.leftIndent
+    const text = leftIndent?.text || ''
+    
     if (!text) return
 
+    // 检查是否启用缩进样式
+    const enableIndentStyle = this.options.enableIndentStyle !== false
+
+    // 获取样式属性
+    // 如果未启用缩进样式，则使用默认值
+    const color = enableIndentStyle
+      ? (leftIndent?.color || this.options.defaultColor)
+      : this.options.defaultColor
+    const bold = enableIndentStyle ? leftIndent?.bold : undefined
+    const fontFamily = enableIndentStyle
+      ? (leftIndent?.fontFamily || this.options.defaultFont)
+      : this.options.defaultFont
+    const fontSize = leftIndent?.fontSize || this.options.defaultSize * this.options.scale
+
+    // 组合字体字符串
+    // 如果有 fontStyle 则优先使用（向后兼容）
+    const font = leftIndent?.fontStyle ||
+      `${bold ? 'bold' : 'normal'} ${fontSize}px ${fontFamily}`
+
     ctx.save()
-    if (font) {
-      ctx.font = font
-    }
+    ctx.font = font
+    ctx.fillStyle = color
     // 设置文本对齐方式为右对齐
     ctx.textAlign = 'right'
     ctx.fillText(text, x, y)
