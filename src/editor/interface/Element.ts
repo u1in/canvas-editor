@@ -167,10 +167,14 @@ export interface IAllowVerticalLayout {
 
 // MODIFY 添加新api 左缩进
 export interface ILeftIndentElement {
-  leftIndent?: {  
+  leftIndent?: {
     text?: string
     width?: number
-    fontStyle?: string
+    fontStyle?: string     // 保留向后兼容
+    color?: string         // 字体颜色
+    bold?: boolean         // 字体粗细
+    fontFamily?: string    // 字体族
+    fontSize?: number      // 字体大小
   }
 }
 
