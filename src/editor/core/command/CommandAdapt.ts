@@ -1587,6 +1587,8 @@ export class CommandAdapt {
     const positionList = this.position.getPositionList()
     const startPosition = positionList[startIndex]
     const endPosition = positionList[endIndex]
+    // 防御性检查：如果位置信息不存在则返回 null
+    if (!startPosition || !endPosition) return null
     const startPageNo = startPosition.pageNo
     const endPageNo = endPosition.pageNo
     const startRowNo = startPosition.rowIndex
