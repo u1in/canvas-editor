@@ -110,7 +110,10 @@ function dblclick(host: CanvasEvent, evt: MouseEvent) {
   })
   // 图片预览
   if (positionContext.isImage && positionContext.isDirectHit) {
-    draw.getPreviewer().render()
+    // 检查是否禁用图片预览
+    if (!draw.getOptions().imagePreviewDisabled) {
+      draw.getPreviewer().render()
+    }
     return
   }
   // 切换区域

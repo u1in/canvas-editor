@@ -106,6 +106,8 @@ export interface IEditorOption {
   lazyRender?: boolean
   /** 是否启用缩进元素样式（颜色、粗细等），默认为 true */
   enableIndentStyle?: boolean
+  /** 是否禁用图片双击预览，默认为 false */
+  imagePreviewDisabled?: boolean
 }
 
 export interface IEditorResult {

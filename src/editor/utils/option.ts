@@ -196,6 +196,7 @@ export function mergeOption(
     pasteAsPlainText: true,
     lazyRender: true,
     enableIndentStyle: false,
+    imagePreviewDisabled: false,
     ...options,
     table: tableOptions,
     header: headerOptions,
