@@ -608,6 +608,10 @@ export function pickElementAttr(
   payload: IElement,
   option: IPickElementOption = {}
 ): IElement {
+  // 防御性检查：当 payload 为 undefined 或 null 时返回安全的默认值
+  if (!payload) {
+    return { value: '' }
+  }
   const { extraPickAttrs } = option
   const zipAttrs = [...EDITOR_ELEMENT_ZIP_ATTR]
   if (extraPickAttrs) {
