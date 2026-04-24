@@ -1,3 +1,4 @@
+import { Base64 } from 'js-base64'
 import { HERSHEY } from './hershey'
 import { SYMB, Symb, asciiMap } from './symbols'
 
@@ -1124,7 +1125,7 @@ export class LaTexUtils {
     o += `"/>`
     o += `</svg>`
     return {
-      svg: `data:image/svg+xml;base64,${window.btoa(o)}`,
+      svg: `data:image/svg+xml;base64,${Base64.encode(o)}`,
       width: Math.ceil(w),
       height: Math.ceil(h)
     }
