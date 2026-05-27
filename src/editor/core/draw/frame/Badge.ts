@@ -85,4 +85,10 @@ export class Badge {
       }
     }
   }
+
+  public clear() {
+    this.imageCache.forEach(img => { img.src = '' })
+    this.imageCache.clear()
+    this.areaBadgeMap.clear()
+  }
 }

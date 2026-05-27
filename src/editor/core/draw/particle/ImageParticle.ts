@@ -24,6 +24,8 @@ export class ImageParticle {
   }
 
   public clear() {
+    // 释放每个缓存图片的解码位图，通知浏览器可回收堆外内存
+    this.imageCache.forEach(img => { img.src = '' })
     this.imageCache.clear()
   }
 

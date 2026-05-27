@@ -108,7 +108,7 @@ import {
   getAnchorElement
 } from '../../utils/element'
 import { mergeOption } from '../../utils/option'
-import { printImageBase64 } from '../../utils/print'
+import { printImageBlob } from '../../utils/print'
 import { Control } from '../draw/control/Control'
 import { Draw } from '../draw/Draw'
 import { INavigateInfo, Search } from '../draw/interactive/Search'
@@ -1412,11 +1412,11 @@ export class CommandAdapt {
     if (scale !== 1) {
       this.draw.setPageScale(1)
     }
-    const base64List = await this.draw.getDataURL({
+    const blobList = await this.draw.getPrintBlob({
       pixelRatio: printPixelRatio,
       mode: EditorMode.PRINT
     })
-    printImageBase64(base64List, {
+    await printImageBlob(blobList, {
       width,
       height,
       direction: paperDirection

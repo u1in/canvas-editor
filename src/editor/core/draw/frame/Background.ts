@@ -114,4 +114,9 @@ export class Background {
       this._renderBackgroundColor(ctx, color, width, height)
     }
   }
+
+  public clear() {
+    this.imageCache.forEach(img => { img.src = '' })
+    this.imageCache.clear()
+  }
 }

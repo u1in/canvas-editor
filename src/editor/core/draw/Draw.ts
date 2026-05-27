@@ -1020,6 +1020,49 @@ export class Draw {
     return dataUrlList
   }
 
+  public async getPrintBlob(payload: IGetImageOption = {}): Promise<Blob[]> {
+    const { pixelRatio, mode } = payload
+    // 放大像素比
+    if (pixelRatio) {
+      this.setPagePixelRatio(pixelRatio)
+    }
+    // 不同模式
+    const currentMode = this.mode
+    const isSwitchMode = !!mode && currentMode !== mode
+    if (isSwitchMode) {
+      this.setMode(mode)
+    }
+    this.render({
+      isLazy: false,
+      isCompute: false,
+      isSetCursor: false,
+      isSubmitHistory: false
+    })
+    await this.imageObserver.allSettled()
+    const blobList = await Promise.all(
+      this.pageList.map(
+        c =>
+          new Promise<Blob>((resolve, reject) => {
+            c.toBlob(blob => {
+              if (blob) {
+                resolve(blob)
+              } else {
+                reject(new Error('Canvas toBlob failed'))
+              }
+            })
+          })
+      )
+    )
+    // 还原
+    if (pixelRatio) {
+      this.setPagePixelRatio(null)
+    }
+    if (isSwitchMode) {
+      this.setMode(currentMode)
+    }
+    return blobList
+  }
+
   public getPainterStyle(): IElementStyle | null {
     return this.painterStyle && Object.keys(this.painterStyle).length
       ? this.painterStyle
@@ -2959,6 +3002,9 @@ export class Draw {
     this.getPosition().setFloatPositionList([])
     this.historyManager.recovery()
     this.imageParticle.clear()
+    this.background.clear()
+    this.waterMark.clear()
+    this.badge.clear()
     this.imageObserver.clearAll()
     this.lazyRenderIntersectionObserver?.disconnect()
     this.lazyRenderIntersectionObserver = null
@@ -2967,6 +3013,66 @@ export class Draw {
     this.globalEvent.removeEvent()
     this.scrollObserver.removeEvent()
     this.selectionObserver.removeEvent()
+
+    // 释放 canvas 像素缓冲区引用
+    this.pageList = []
+    this.ctxList = []
+    // 释放子模块引用，断开循环引用链（子模块 -> draw -> container/pageList）
+    // 防止子模块间接持有 DOM 引用导致 GC 无法回收
+    this.cursor = null as unknown as Cursor
+    this.canvasEvent = null as unknown as CanvasEvent
+    this.globalEvent = null as unknown as GlobalEvent
+    this.position = null as unknown as Position
+    this.zone = null as unknown as Zone
+    this.range = null as unknown as RangeManager
+    this.margin = null as unknown as Margin
+    this.background = null as unknown as Background
+    this.badge = null as unknown as Badge
+    this.search = null as unknown as Search
+    this.group = null as unknown as Group
+    this.area = null as unknown as Area
+    this.underline = null as unknown as Underline
+    this.strikeout = null as unknown as Strikeout
+    this.highlight = null as unknown as Highlight
+    this.previewer = null as unknown as Previewer
+    this.imageParticle = null as unknown as ImageParticle
+    this.laTexParticle = null as unknown as LaTexParticle
+    this.textParticle = null as unknown as TextParticle
+    this.tableParticle = null as unknown as TableParticle
+    this.tableTool = null as unknown as TableTool
+    this.tableOperate = null as unknown as TableOperate
+    this.pageNumber = null as unknown as PageNumber
+    this.lineNumber = null as unknown as LineNumber
+    this.waterMark = null as unknown as Watermark
+    this.placeholder = null as unknown as Placeholder
+    this.header = null as unknown as Header
+    this.footer = null as unknown as Footer
+    this.hyperlinkParticle = null as unknown as HyperlinkParticle
+    this.dateParticle = null as unknown as DateParticle
+    this.separatorParticle = null as unknown as SeparatorParticle
+    this.pageBreakParticle = null as unknown as PageBreakParticle
+    this.superscriptParticle = null as unknown as SuperscriptParticle
+    this.subscriptParticle = null as unknown as SubscriptParticle
+    this.checkboxParticle = null as unknown as CheckboxParticle
+    this.radioParticle = null as unknown as RadioParticle
+    this.blockParticle = null as unknown as BlockParticle
+    this.listParticle = null as unknown as ListParticle
+    this.lineBreakParticle = null as unknown as LineBreakParticle
+    this.leftIndentParticle = null as unknown as LeftIndentParticle
+    this.control = null as unknown as Control
+    this.pageBorder = null as unknown as PageBorder
+    this.i18n = null as unknown as I18n
+    this.historyManager = null as unknown as HistoryManager
+    this.listener = null as unknown as Listener
+    this.eventBus = null as unknown as EventBus<EventBusMap>
+    this.override = null as unknown as Override
+    this.workerManager = null as unknown as WorkerManager
+    this.scrollObserver = null as unknown as ScrollObserver
+    this.selectionObserver = null as unknown as SelectionObserver
+    this.imageObserver = null as unknown as ImageObserver
+    // 最后释放容器引用
+    this.container = null as unknown as HTMLDivElement
+    this.pageContainer = null as unknown as HTMLDivElement
   }
 
   public clearSideEffect() {

@@ -185,4 +185,9 @@ export class Watermark {
       this.renderText(ctx, pageNo)
     }
   }
+
+  public clear() {
+    this.imageCache.forEach(img => { img.src = '' })
+    this.imageCache.clear()
+  }
 }
